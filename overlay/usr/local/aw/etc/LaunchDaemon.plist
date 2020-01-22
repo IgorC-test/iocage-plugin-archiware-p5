@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC -//Apple Computer//DTD PLIST 1.0//EN http://www.apple.com/DTDs/PropertyList-1.0.dtd>
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.archiware.presstore.SERV</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>NSD</string>
+        <string>-u</string>
+        <string>USER</string>
+        <string>-i</string>
+        <string>-t</string>
+        <string>config/SERV.PORT</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>HOME</string>
+
+    <key>StandardOutPath</key>
+    <string>log/SERV.tmp</string>
+
+    <key>StandardErrorPath</key>
+    <string>log/SERV.tmp</string>
+
+    <key>UserName</key>
+    <string>USER</string>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>Umask</key>
+    <integer>0</integer>
+
+    <key>HardResourceLimits</key>
+    <dict>
+        <key>NumberOfFiles</key>
+        <integer>1288</integer>
+    </dict>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>DYLD_LIBRARY_PATH</key>
+        <string>HOME/bin:HOME/bin/othrltfs:HOME/bin/ibmltfs</string>
+        <key>DYLD_FALLBACK_LIBRARY_PATH</key>
+        <string>HOME/bin</string>
+        <key>TCL_LIBRARY</key>
+        <string>HOME/lib/tcl8.5</string>
+        <key>TMPDIR</key>
+        <string>HOME/temp</string>
+        <key>LANG</key>
+        <string>en_US.UTF-8</string>
+        <key>LC_TIME</key>
+        <string>C</string>
+        <key>PATH</key>
+        <string>UPTS</string>
+    </dict>
+</dict>
+</plist>

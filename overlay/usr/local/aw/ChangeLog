@@ -1,0 +1,4872 @@
+2020-01-15 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 6.0.0 released.
+
+2019-12-12 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.6.6 released.
+
+       * Fixed archive job inventory for local/remote clients. (Bug #1100)
+
+       * Fixed protection issues during archive verify. (Bug#778)
+
+       * Fixed rare crashes on Windows possibly involving
+         jukebox heartbeat monitor. (Bug #1126)
+
+       * Fixed Windows restore for existing directories. (Bug#1124)
+
+       * Fixed Windows crash during Backup on ReFS. (Bug#1099)
+
+       * Fixed auto-recognition of Qnap devices. (Bug#1102)
+
+       * Fixed general slowdown of filesystem operations on Windows.
+
+       * Storage devices now re-check block position after
+         having written 4096 blocks in a row.
+
+2019-08-27 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.6.5 released.
+
+       * Fixed rename/delete of user-forks for Helios.
+
+       * Fixed manual archive index purge (Bug#1021).
+
+       * Allow operator users to stop/start/cancel jobs
+         (Bug#1037).
+
+       * Disable legacy options for archive preview
+         generators based on Apple QuickTime (Bug#1038).
+
+       * Fixed archive index backups on filesystems that
+         do not support xattr (Bug#1042).
+
+       * Fixed object store uploads that crashed while
+         reporting invalid object ID (Bug#1046).
+
+       * Fixed delegated client2local sync (Bug#1064).
+
+       * Fixed email attachment for non-localhost clients
+         (Bug#1066, Bug#1067).
+
+       * Fixed "permissions denied" sync case on Windows
+         (Bug#1076).
+
+       * Fixed deletion of directories on restore.
+         (Bug#1124).
+
+2019-04-18 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.6.4 released.
+
+       * Fixed handling of symbolic links for files on
+         Windows when synced from a different OS. (Bug#997)
+
+       * Fixed "not null" constraints error when filling the
+         filesystem table during the backup. (Bug#994)
+
+       * Fixed storage of Mac decomposed-unicode files on
+         foreign (non Mac) filesystems. (Bug#988).
+
+       * Fixed CLI "ArchiveSelection destroy" behaviour
+         to return correct values. (Bug#984)
+
+       * Fixed field-name in B2 cloud template. (Bug#982)
+
+       * Fixed rare crash issues during cloud upload. (Bug#978)
+
+       * Fixed error during folder-creation out of the file-picker
+         on Windows. (Bug#977)
+
+       * Fixed TCC issues for Mac Mojave OS. (Bug#972).
+
+       * Work-around problems of chunked cloud volumes where
+         positively acknowledged file/chunk upload does not
+         result in the chunk being retrievable from the service.
+         For additional security we now double-check the operation
+         by initiating a restore attempt for the same chunk.
+
+       * Changed/repaired browser link for Qnap NAS.
+
+       * Changed server port from 8000 to 8001 for Qnap NAS.
+
+2019-02-14 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.6.3 released.
+
+       * Fixed mail re-send logic to regenerate temporary
+         files after each try. Also fixed awmail to correctly
+         generate sub-second unique message IDs (Bug#945).
+
+       * Fixed recognition of filesystem volumes located
+         deeper in the directory structure (Bug#954).
+
+       * Added new CLI command [RestoreSelection size]
+         which returns total size in bytes of all files
+         in the selection object (FR#950).
+
+       * Declared CLI [ArchiveSelection size] deprecated,
+         use [ArchiveSelection entries] instead.
+
+       * Improved CLI selection handling to allow multiple
+         parallel selections open at any time.
+
+       * Fixed typo in this file for 5.6.2 release that
+         references ns_section commands (Bug#946).
+
+       * Removed drive-type check for LTFS (Bug#953).
+
+       * Fixed support for 2+ simultaneously mounted
+         LTFS volumes (Bug#958).
+
+       * Added config database optimisations to reduce
+         concurrency and number of updates for certain
+         job types (Bug#959).
+
+       * Improved error reporting for client2client sync.
+
+       * Fixed backing up archive index on Windows (Bug#951).
+
+       * Fixed tape drive cleaning that was broken
+         in 5.6.2. (Bug#914)
+
+       * Fixed remote update for FreeBSD clients (Bug#957).
+
+       * Fixed CLI creation of indexes (Bug#965).
+
+       * Fixed timeouts in Client2Client syncs when large
+         source datasets were involved (Bug#970).
+
+2019-01-08 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.6.2 released.
+
+       * Re-introduced FreeBSD/amd64 port for FreeBSD V11.
+         Deprecated: SCSI device support.
+
+       * Re-introduced Solaris/Intel port for Solaris 10+.
+         Deprecated: SCSI device support.
+
+       * FR#930: Adding metadata in P5 archive.
+
+         Added more clever logic: per-job metadata can be 
+         overriden by non-empty per-file metadata. 
+         One can mix both but one cannot combine/merge values.
+
+       * FR#929: Backup of nested filesystems.
+
+         In order to support backup of large/deep hierarchical
+         filesystems (like for example ZFS) one can now enable
+         crossing filesystem boundary while walking the 
+         filesystem tree and looking for changed files.
+         To do that, one needs to edit config/lexxsrv.<PORT>
+         file (where <PORT> is the value assigned during the
+         installation; default = 8000), and put those two lines
+         somewhere at the end of the file:
+
+            ns_sect ns/server/$server/module/Backup/CLIENT
+            ns_param crossFilesystemBoundary true
+  
+         where CLIENT is the name of the P5 client.
+         Default value for crossFilesystemBoundary is "false",
+         which means that file walk will not cross filesystem
+         boundary.
+
+         After changing the file, P5 needs to be restarted for
+         changes to become active.
+
+       * FR#895: volumes with backing cloud-stores can now be
+         manually synced-up with the cloud storage, regardles
+         of their internal state. This aids in cleaning-up the
+         volume cache for volume data stored in cloud only.
+
+       * FR#875: sending e-mail is now more persistent in case
+         of mail-server connection problems.
+
+       * FR#874: added CLI command "Volume jobs" that lists job
+         names of all the jobs that were writing to the volume.
+
+       * FR#861: added tunable size for disk IO operations.
+
+         To change disk IO size, edit the config/lexxsrv.<PORT>
+         file (where <PORT> is the value assigned during the
+         installation; default = 8000) and put those two lines
+         somewhere at the end of the file:
+
+            ns_sect ns/server/$server/module/jobex/CLIENT
+            ns_param bioSize SIZE
+
+         where CLIENT is the name of the P5 client
+         and SIZE is a value in bytes, aligned to 512.
+
+         After changing the file, P5 needs to be restarted for
+         changes to become active.
+
+       * Added multithreading support for Sync cycle creation
+         on filesystems w/o snapshot option.
+
+         To enable MT, one needs to edit config/lexxsrv.<PORT>
+         file (where <PORT> is the value assigned during the
+         installation; default = 8000), and put those two lines
+         somewhere at the end of the file:
+
+            ns_sect ns/server/$server/module/Sync
+            ns_param cycleThreadCount 1
+  
+         Default value for cycleThreadCount is 1 (one).
+         Increasing number of threads for cycle generation might
+         speed up this (lenghtly) operation if target filesystem
+         is located on SSD device or on a very fast RAID system. 
+
+         After changing the file, P5 needs to be restarted for
+         changes to become active.
+
+       * Fixed B2Go connection losses after 3 minutes waiting
+         for the next changed file (Bug#928).
+
+       * Fixed entering old-style licenses (Bug#925).
+
+       * Fixed timeouts in Sync during long snapshot creation
+         (Bug#923).
+
+       * Fixed mail delivery when two or more e-mails were
+         sent within one second interval (Bug#921).
+
+       * Fixed cleanup of backup indexes containing large
+         number of recycled volumes (Bug#918).
+
+       * Fixed handling of Mac resource forks for HFS+ -> HFS+ 
+         copies (Bug#915).
+
+       * Added "ignore cleaning flag" for special applications.
+         To ignore the cleaning flag for selected drives, edit
+         the config/lexxsrv.<PORT> file (where <PORT> is the
+         value assigned during the installation; default = 8000)
+         and put those two lines somewhere at the end of the file:
+
+            ns_sect ns/server/$server/module/medmgr
+            ns_param dontClean "DEV1 DEV2 ... DEVn"
+
+         where DEV1, DEV2, etc. are names of the tape devices
+         as shown in the P5 GUI.
+
+         After changing the file, P5 needs to be restarted for
+         changes to become active.
+  
+       * Fixed write-speed issues for large-file archives (Bug#913).
+
+       * Fixed auto-recognition of EtherShare volumes (Bug#907).
+
+       * Fixed crashes on archives to cloud when jobs terminate
+         unexpectedly or get cancelled manually (Bug#904).
+
+       * Fixed crashes on Mac (and possibly other platforms) when
+         rebuilding indexes after the backup.
+
+       * Reduce number of warnings in GUI about Sync plans running
+         in transfer mode (Bug#900).
+ 
+       * Fixed restore entry for Sync plans when there is only
+         one Sync license configured (Bug#989).
+
+       * Fixed mode of resource sub-directories created during the
+         restore within EtherShare volumes to 0777 (Bug#892).
+
+       * Fixed spurious virtual tape driver errors claiming the
+         volume being written has no label attached (Bug#891).
+ 
+       * Fixed loading the LTFS driver for IBM LTO drives (Bug#890).
+
+       * Fixed Sync file-event handling when source of events is
+         not the localhost computer (Bug#888).
+
+       * Fixed "Back Arrow" side-effects in GUI after log-in (Bug#885).
+
+       * Added missing Client2Client manual Sync option (Bug#884).
+
+       * Removed Cancel button from log-out pane (Bug#882).
+
+       * Fixed Backup job lock-out after Volume recycle (Bug#877).
+
+       * Added Application-Key support for BackBlaze cloud (Bug#858).
+
+       * Fixed resource fork handling during restore to non-HFS
+         filesystems resulting in IO-error messages (Bug#901).
+
+       * Fixed generic install script on Unix to ignore Synology
+         install options (Bug#842).
+ 
+       * Removed scanning files before arhive and backup.
+         This feature was simply consuming resources and
+         did not provide any realy useful information.
+        
+       * Fixed label of cloud volumes in case of upload errors
+         (Bug#820).
+
+       * Improved bandwidth throttle code to handle 10Gbps
+         ethernet links (Bug#143).
+
+2018-10-19 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.6.1 released.
+
+       * Fixed issues when logging-in as root into the GUI.
+    
+       * Fixed special characters handling in Sync from
+         Helios (and potentially Xinet) fileserver volumes.
+
+       * Introduced new network throttle implementation.
+
+       * Fixed multi-part upload (1GB+ files) for AWS cloud.
+
+       * Fixed auto-start on boot for Linux Ubuntu 18+ version.
+
+       * Improved cancellation of client2client sync jobs.
+
+2018-10-04 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.6.0 released.
+
+2018-07-15 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.5.6 released.
+
+        * Fixed device handling for incremental backups
+          that caused unnecessary full backups sometimes.
+
+        * Added log about used archive index offset to
+          aid support.
+
+        * Fixed snapshot purge for backup that caused far
+          too many snapshots to be held online.
+
+        * Fixed treatment of user preference records with
+          embedded blanks.
+
+2018-05-15 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.5.5 released.
+
+        * Fixed handling for BackBlaze file deletions.
+
+        * Fixed core when backing up B2Go repository.
+
+        * Fixed import of volumes.
+
+        * Fixed preview generation that got broken with
+          the recent fixes in 5.5.4 w.r.t file uploads.
+
+        * Fixed reading windows resource fork after
+          being broken by Windows security update.
+
+2018-04-05 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.5.4 released.
+
+        * Improved file upload/download to/from clients.
+          Uses timed non-blocking transfer with regular
+          http post/get sequence. Previous behaviour
+          resulted in partial transfers on heavily loaded
+          MT-machines. Transfer is still limited to 2GB.
+
+        * Suppresed creation of void database files outside
+          the config directory (Bug #778, #775).
+
+        * Added object store volume cleanup job at the end
+          of executing a backup/archive job.
+
+        * Fixed handling of bonded file-systems for backup.
+
+        * Fixed race condition for CLI jobs that reported
+          completed state before actually started by the
+          scheduler thread (Bug #776).
+
+	* Added a checksum to P5 exe on Windows to accomodate
+	  the Tandberg RDX Access Control client and the
+	  ransom blocker.
+
+        * Fixed file-events handling on Mac to cope with
+          last-reported-event of zero which may result in
+          irregular overflow errors.
+
+        * Changed ID's of the objects stored on object stores
+          to look like paths so implementations may optimize.
+
+2017-12-19 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.5.3 released.
+
+        * Fixed QNAP creation of folders from the GUI file selector.
+
+        * Fixed case when two or more archive jobs work on the partially
+          overlapping directory structures that have never been archived
+          before (Bug #684/#753).
+
+        * Fixed ctime disable setup in config file (Bug #731).
+
+        * Fixed B2Go restore on Windows clients (Bug #741/#742).
+
+        * Fixed media changer internal error when attempting to mount
+          subsequent volume(s) (Bug #751).
+
+        * Fixed volume regeneration in disk media changer (Bug #756).
+
+        * Fixed CLI to properly check username for socket conns (Bug #757).
+
+        * Fixed CLI inventory commands that were not reporting entry handles
+          at all after update to V5.5 (Bug #759/#764).
+
+        * Fixed file-events sync that was causing too much directories to
+          be reported as changed.
+
+        * Fixed cases where we hit locked database on various index ops.
+
+        * Added basic support for new Apple APFS filesystem (FR #744).
+
+2017-11-06 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.5.2 released.
+
+        * Added LTO8 to the list of supported tape drives.
+
+        * Added separate config file options for testing inode change time
+          for backup and archive jobs and combined. Those are controlled
+          over three config options:
+
+             a.
+	     ns_section ns/server/$server/module/ArchiveLookupSelection
+             ns_param testInodeChangeTime true|false
+
+             b.
+	     ns_section ns/server/$server/module/BackupLookupSelection
+             ns_param testInodeChangeTime true|false
+
+             c.
+	     ns_section ns/server/$server/module/LookupSelection
+             ns_param testInodeChangeTime true|false
+
+          The a. configures the option for archive plans only.
+	  The b. configures the option for backup plans only.
+	  The c. configures the option for any plan.
+
+          Default is "true" i.e. check inode change time when doing
+          incremental save operation. Can be set to "false" to avoid
+          testing inode change time. A file inode changes every time
+          there is a change of the ACL, ownership and/or metadata
+          of the file.
+
+        * Fixed client2client sync that occasionally left the synced
+          files on the server machine.
+
+        * Fixed stop signal for archive/backup jobs to correctly propagate
+          to object store up/downloaders.
+
+        * Fixed B2Go encryption backup for (at least) Mac clients.
+
+	* Fixed object store up/downloaders on Synology devices that were
+          occasionally stalled on an unknown file descriptor.
+
+	* Fixed access to Manual Archiving for non-privileged users who
+          are granted archiving privilege.
+
+	* Fixed syntax error during automatic recycling causing a failed message
+	  in the log and failing to mail the result of recycling.
+
+2017-10-16 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.5.1 released.
+
+        * Fixed treatment of user-defined meta keys for arhive indexes
+          which contain interpunction characters (Bug#701).
+
+        * Fixed volume-chunk deletion during volume re-label (Bug#702).
+
+        * Added option to configure ctime checking separately for
+          archive and backup incremental operations (FR#706).
+
+        * Fixed bad connection test for Generic S3 cloud services.
+          Also, reduced timeout on connection problems from five
+          to one minute, as not to block GUI for too long (Bug#708).
+
+        * Fixed some minor compatibility issues in generic S3 object
+          store connector.
+
+        * Improved remote agent login handling for delegated syncs.
+
+        * Fixed occasions where regular blockpool teardown might be
+          interpreted as error, effectively making valid jobs to fail.
+
+        * Fixed occasional index corruption happening after some index
+          maintenance tasks.
+
+        * Added cloud wizzard in the GUI.
+
+        * Fixed occasional communication issues in Sync jobs when
+          transferring very small checkum difference file(s).
+
+        * Honour job stop signals within volume chunk uploads.
+
+        * Fixed B2Go encryption handling for backup.
+
+        * Fixed job monitor issues where a cascade of running jobs
+          may miss the top-level job slot for progress/cancel.
+
+2017-09-07 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.5.0 released.
+
+2017-07-12 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.4.4 released.
+
+        * Fixed BTRFS snapshot creation when target directory is
+          on a subvolume (FR#652).
+
+        * Fixed CLI Job status command that may return wrong results
+          due to timing issues (Bug#658).
+
+        * Updated CLI with [Workstation name] command, that when
+	  executed on the workstation, will return its name/ID
+          assigned on the server (FR#34).
+
+        * Updated CLI [Volume location] to show info about the slot
+          if the volume is found to be in a media changer (FR#570).
+
+        * Fixed wire-protocol error when restoring multi-volume job to
+          remote clients (Bug#645).
+
+        * Fixed volume usetime and usecount during tape recycle (Bug#641).
+
+        * Fixed job result after restore job ran in error (Bug#632).
+
+        * Fixed B2Go file deletion of files containing special escaped
+          characters, that left the file hanging in repository (Bug#628).
+
+        * Suppresses CLI Archive jobs with empty archive selection.
+          The submit command will simply return error (Bug#626).
+
+        * Fixed README1st.txt in Windows distribution (Bug#625).
+
+        * Fixed incremental backup that turned to full after device
+          ID changes (Bug#621).
+
+        * Set configuration database file to be read by root only (Bug#614).
+
+        * Fixed automatic B2Go workstation upgrade (Bug#613).
+
+        * Fixed cases where verify after archive required additional
+          media volumes that were not used by the job (Bug#610).
+
+        * Fixed Sync job failure when syncing to Helios Volumes with
+          cycles set (Bug#600).
+
+        * Fixed nsdchat to recognize URL-encoding in awsock/awfile
+          targets, as to be able to pass "@" (and perhaps other
+          special characters) in user/password fields (Bug#599).
+
+        * Fixed incremental backup for re-mounted Volumes (Bug#589).
+
+        * Changed shell-scripts to include "P5" product name (Bug#563).
+
+        * Fixed processing of "restore-to" parameter in RestoreSelection
+          addentry CLI command (Bug#492).
+
+        * CLI commands for BackupPlan start/stop are now no-ops.
+
+2017-03-10 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.4.3 released.
+
+        * Fixed switching of snapshots w.r.t. GUI browser position.
+
+        * Added [ArchivePlan incrlevel] CLI command.
+
+	* Added [Pool enable|enabled|disable|disabled] CLI commands.
+
+        * During restore, recognize admin users as privileged.
+
+        * Added cli::index::fixmedia index utility command.
+
+        * Fixed server-restore of B2Go workstation data.
+
+        * Improved cancellation of cloud archive jobs.
+
+        * Fixed excessive CPU usage for cloud archive jobs.
+
+        * Fixed encrypted-data backup/archive from clients.
+
+        * Fixed volume migration and synthetic backup.
+
+        * Run media size calculations only for volumes used by
+	  the current job. This fixes timing issue of index
+	  cleanup during job termination.
+
+2017-01-12 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.4.2 released.
+
+        * Improved object store up/download handling by reducing
+          log calculation frequency and thread creation/teardown.
+
+        * Fixed sole-file CLI restores in the compatibility mode.
+
+        * Produce better error log when trying to restore encrypted
+          files to client w/o correct encryption key set.
+
+        * Fixed incremental archive for object store archives.
+
+        * Filter out .zfs directory from being operated on.
+
+        * Skip disabled and/or P4 archive indexes from the
+          object store usage calculation.
+
+        * Fixed call to Windows user-defined preview scripts.
+
+        * Fixed preview generation for some oddly named files.
+
+        * Fixed restore to remote clients when hitting the filemark.
+
+2016-12-06 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.4.1 released.
+
+        * Fixed broken Sparc/64bit port.
+
+        * Skip auto-update for clients that are servers themselves.
+
+        * Fixed indexer error when adding cloned address records.
+
+        * Fixed rare media-block formatting error for checksum trailers.
+
+2016-11-29 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.4.0 released.
+
+2016-11-29 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.3.4 released.
+
+        * Improved handling of hierarchically mounted filesystems
+          during restore.
+
+        * Improved interaction with FreeBSD CAM system.
+
+        * Fixed crashes related to media changer heartbeat thread
+          when running on FreeBSD hosts.
+
+        * Fixed erroneously setting old volume to suspect after recycling.
+
+2016-10-10 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.3.3 released.
+
+        * Workaround for Overland NEO drive serial number reporting
+          while querying the library for element status.
+
+	* Corrected time stamp on restored and synced folders on Windows 64-bit.
+
+        * CLI now reports all jobs that were either scheduled,
+          started or running as "terminated" if the server was
+          pulled down or crashed during the operation. (Bug #458)
+
+        * Fixed index behaviour for directories that lost their address
+          record somehow (perhaps during volume deletions). (Bug #444)
+
+        * Fixed server crash during verify runs on archive if the
+          client encryption was turned on. (Bug #447)
+
+        * Fixed "invalid-id-to-filename" errors when restoring to clients
+          if the client encryption was turned on. (Bug #457)
+
+        * Fixed backup of empty top level directories. (Bug #462)
+
+        * Fixed nsdchat utility interactive mode not to block
+          on "exit" command. (Bug #121)
+
+        * Fixed index handling when 2 Full backup jobs operate on
+          same directory structure and are executing "near" each
+	  other, timewise. (Bug #464).
+
+        * Fixed sync in update mode when remote file versions are
+          enabled and source contains hard-linked files. (Bug #421)
+
+        * Added cli::index::prunedirs method to clear the index from
+          empty directories not found on any known volummes or ones
+	  created as helping stepstones for maintaning tree integrity.
+
+        * Fixed delete-stamp of files in the index that have been
+          deleted on the filesystem to match the backup time of the
+          increment run that found them missing. (Bug #474)
+
+        * Fixed expression for locating changed files for incr Archives.
+          (Bug #471)
+
+        * Improved index re-page routine to backup the live DB file
+          before the attempt to re-page and/or filter the records.
+
+        * Added option to set port 587 with default TLS protocol for
+          mail delivery. The port 465 is reserved for the SSL.
+
+        * Fixed incremental archive for directories that have been
+          moved or renamed in the index.
+
+        * Added CLI subcommand [ArchiveSelection level]
+
+2016-03-14 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.3.2 released.
+
+        * CLI restores now corectly select the right
+          timed-instance of the file at the given path.
+
+        * Fixed situations in Archive index when same
+          paths are being moved and re-archived again.
+
+        * Fixed mail delivery to better handle various
+          security-related mailer setups.
+
+        * Fixed finder-info restores on Xinet volumes
+          when files are being relocated into completely
+	  empty directories.
+
+        * Fixed handling of parametrized preview and/or
+	  metadata user-defined scripts for archive jobs.
+
+        * Fixed handling of clone volumes where we could
+          require both the volume and its clone during the
+          verify passes.
+
+        * Skip generating previews where internal preview
+          generator was implicitly disabled and the provided
+          user-defined preview generator decied not to make
+          previews for certain file types.
+
+	* Fixed detection of Linux devices for high LUNs
+          and for DDP.
+
+        * Fixed search GUI on Windows.
+
+        * Fixed recognition of non-Mac streams within
+          Helios volumes.
+
+        * Corrected test mail sending when the "New Notification"
+          event was removed from the list of configured events.
+
+        * Archive job inventory file is now automatically ZIP'ed
+          if larger then some predefined value. The default size
+          above which the file is zipped is 16MB. This can be
+          controlled by the config option:
+
+              ns_section ns/server/$server/module/job
+              ns_param maxInventorySize 16777216
+
+         * Removed traces of Growl from the notifier code.
+
+         * Fixed rare race-condition in indexer for backup operation
+           related to backups with enabled file-prescan.
+
+2015-12-14 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.3.1 released.
+
+        * Fixed linking to correct binaries on new installs.
+
+        * Uses /sys instead of /proc when looking up
+          SCSI devices on newer Linux installs.
+
+        * Simplified and improved GUI interface for search
+          function in Archive and Backup indexes.
+
+        * Fixed 64-bit Solaris11 SCSI device access.
+
+2015-10-15 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.3.0 released.
+
+2015-09-10 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.2.2 released.
+
+        * Fixed lookup selection when generating entries
+          for root.
+
+        * Fixed query expression when selecting/sorting
+          nodes on backup time column.
+
+        * Fixed sync cycle management during cycle purge.
+
+2015-08-10 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.2.1 released.
+
+        * Fixed remote update of older (i386) Mac OSX clients.
+
+        * Fixed handling of volumes to backup containing blanks
+          in their mount points.
+
+        * Ignore previous configuration of the user-defined
+          mail script; always use our own mail sender(s).
+
+        * Improved browsing for archive indexes to exclude
+          files located on unknown (recycled) volumes.
+
+        * Fixed browsing P4 backup index.
+
+        * Fixed changing index option in P4 backup index.
+
+        * Fixed file version restore in P4 backup index.
+
+        * Fixed timing problem with Firefox browser within
+          restore option window.
+
+        * Fixed Windows B2Go client login problem.
+
+        * Fixed setting old volume to suspect after automatically
+          recycling it during a running job.
+
+        * Improved Windows installation procedure.
+
+        * Improved volume import to allow continuation of the
+          import in case of job error or cancellation.
+
+        * Volume mode can now be manually re/set to Migrated.
+
+        * Added compatibility for CLI restores to allow restoring
+          files at the original (physical) path  if no relocation
+          was requested, as for version 5.1 and below.
+
+        * Added log traces for per-job activation and completion
+          callbacks.
+
+        * Fixed restore relocation for archive jobs on Windows.
+
+        * Fixed default hint for relocation path for archive
+          restores in GUI.
+
+        * Fixed id/path translation for remote archive restores.
+
+        * Removed UUID (GUID) handling for ZFS filesystems since
+          it resulted in occasional duplicates thus yielding two
+          or more different filesystems having the same UUID.
+
+        * Fixed occasional crashes when restoring from archive.
+
+2015-06-01 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.2.0 released.
+
+2015-03-19 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.1.9 released.
+
+        * Fixed indexing of saved resources when the names
+          contain multibyte characters.
+
+        * Fixed incremental archive over CLI if the files
+          being archived were not found in the index already.
+
+        * Fixed handling of multibyte international chars
+          and special escaped charachters when browsing
+          and/or querying archive and/or backup indexes.
+
+2015-03-06 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.1.8 released.
+
+        * Fixed resource reservation and volumes to drives
+	  assignment in cases of unbalanced resources for
+	  cloning (no such VolumeResource error).
+
+        * Fixed further problems with file times on Windows
+	  due to Daylight Saving Time switch.
+
+        * Fixed reappearing duplicate folder entries in the
+	  index.
+
+        * Fixed incremental archive verify job not to error
+          if the incremental archive saved no files.
+
+        * Fixed CLI [RestoreSelection findentry] to correctly
+          return number of entries found and placed in the
+          selection object.
+
+        * Fixed P4 to P5 conversion of archive indexes containing
+          empty metacolumns (name of the metacolumn was empty string)
+
+        * Limited visibility of files containing credential info.
+
+        * Fixed post-archive deletion logic to delete directories
+          if configured so.
+
+        * Fixed remote filesystem list sorting on name, size and
+	  modification times.
+
+        * Fixed restore of files containing double-wildcards in the
+	  file or directory name.
+
+        * Fixed handling of Win volumes and directories in
+	  post-archive tasks.
+
+	* Fixed CLI incremental archive of singleton files.
+
+        * Fixed speed issues when migrating volumes.
+
+2014-11-01 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.1.7 released.
+
+        * Fixed Windows repeating root index entries.
+
+        * Fixed incremental save of VSS file systems on Windows.
+
+        * Fixed migration from one cloned pool to another.
+
+        * Fixed restore from multiple file systems simultaneously.
+
+        * Fixed Backup2Go retention of workstation snapshots.
+
+	* Worked around Windows Daylight Saving Time bug.
+
+        * Improved backup preparation speed.
+
+	* Improved restore preparation speed.
+
+        * Improved GUI index browsing speed.
+
+        * Improved GUI index search speed.
+
+        * Improved cancellation response for backup jobs.
+
+        * Added experimental FreeBSD 9.2+ port (64bit only).
+
+	* Added new CLI command [RestoreSelection volumes].
+
+	* Added new CLI command [RestoreSelection entries].
+
+2014-08-25 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.1.6 released.
+
+        * Added new CLI command [Job inventory].
+
+        * Added timed-cache for user/password checking
+          on Linux CLI dispatcher thread.
+
+        * Fixed handling trailing blanks in CLI paths.
+
+        * Fixed potential memory overrun in block generator.
+
+        * Set the default TMPDIR to our private temp directory.
+
+        * Fixed handling of "mount -bind"-ed Linux filesystems.
+
+2014-07-16 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.1.5 released.
+
+        * Added fixed 3-months job-log inspection interval
+          plus user-defined, up to 3 months interval selector.
+
+        * Fixed cases in backup when two or more backup plans,
+          some with filters and some not, are saving the same
+          directory structure.
+
+        * Fixed UTF-8 and some special characters processing
+          for CLI operations. Currently just the backslashes
+          in pathnames are unsupported.
+
+        * Expanded standard PATH variable that is passed to
+          callback scripts to include /bin dir on Mac OSX.
+
+        * Corrected STK library drive serial ID detection.
+
+        * Rewritten volume import to sequentially read the
+          whole volume, check all blocks and re-index.
+
+        * Relaxed device-ID requirement when building lookup
+          selection for backups.
+
+        * Cloud Sync requires WingFS 2.0 release.
+
+2014-06-05 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.1.4 released.
+
+        * Reduced memory consumption for backup when saving
+          large number of clients simultaneously.
+
+        * Improved check for simultenaous backup/archive of
+          same folders in the case when one job partially
+          registers the directories to check and failing to
+          de-register them in the case of error.
+
+        * Worked around a bug in Facilis to enable using
+          the Facilis file system.
+
+        * Corrected recognizing and saving the deduplicated files
+          on Windows.
+
+        * Fixed CLI "Device inventory" to return only volume ids.
+
+        * Added listing of mounted Windows volumes in file selection.
+
+2014-04-14 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.1.3 released.
+
+        * Added "onfilecreation" callback for CLI RestoreSelection.
+
+        * Corrected labeling and mounting LTFS tapes in
+          tape libraries.
+
+        * Improved deadlock avoidance when multiple concurrent
+          jobs are competing for devices during the process
+          of unmounting a pool.
+
+        * Corrected Sun device detection that got broken
+          in the previous version.
+
+        * Fixed backup snapshot deletion that may erroneously
+          delete one of the previous snapshots that did not
+          actually expire.
+
+        * Fixed Linux SCSI driver to properly handle sense data.
+
+        * Disabled waiting on available volumes for index save jobs.
+
+2014-03-17 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.1.2 released.
+
+        * Changed relocation logic when restoring multiple
+          elements as to avoid potential file collision.
+          Single elements are relocated with stripping their
+          leading path and relocating directly into the
+          relocation directory.
+          Multiple elements are relocated with their leading
+          path retained in the relocation directory.
+
+        * Included support for Helios UB64.
+
+        * Fixed indexing when some leading path parts of the
+          saved files were not indexed completely and
+          thus resulted in generation of hollow (help) nodes.
+
+        * Testing scsi devices on Linux independently of "lsscsi".
+
+        * Fixed handling of filesystem mountpoints when saved
+          together with the root filesystem in one plan.
+
+        * Fixed creation of user-defined root nodes in archive.
+
+        * Changed check of overlapping directories for archive
+          plans from common client to common index.
+
+        * Added checks for unreported EOM under certain
+          unclear conditions, which may lead to loss of data
+          by writing beyond the physical end of tape.
+
+        * Corrected network throtteling when set to 100%.
+
+        * Further fix for job ids.
+
+2014-02-20 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.1.1 released.
+
+        * Fixed job ids list in volumes.
+
+        * Fixed volumes being set to suspect after
+          automatic relabling.
+
+        * Fixed browsing of P4 indexes.
+
+        * Fixed return for CLI RestoreSelection findentry.
+
+        * Fixed baremetal recovery W.R.T. index check for
+          client localhost.
+
+        * Workaround when encountering invalid UTF-8 sequences
+          in filenames during Sync.
+
+        * Fixed marking of deleted elements in backup index.
+
+        * Set restore time for all files from archive databases
+          so we can do some clever decisions for incr archives.
+
+        * Implemented sorting for directory content display in GUI
+          when sorting on custom columns.
+
+        * Corrected check for licensed slots in library.
+
+        * Fixed GUI sorting order to ignore case.
+
+        * Fixed indexing of files during parallel device
+          operations.
+
+        * Fixed B2Go purge operations to better handle
+          special/edge cases.
+
+        * Enabled regular auto-restart of clients.
+
+        * Improved Linux tape and library device detection.
+          Requires "lsscsi" utility.
+
+        * Workarround bug in some BTRFS implementation that
+          do not allow creating of readonly snapshots.
+
+        * Corrected GUI display of files in file system that
+          have no streams.
+
+        * Changed volume counters to allow sizes larger
+          then 4TB.
+
+        * Disabled checking of Google-Drive authentication
+          prior mounting the drive.
+
+        * Improved deadlock avoidance when multiple jobs
+          and drives are mounting, unmounting and labeling
+          tapes.
+
+2014-01-14 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.1.0 released.
+
+        * Improved speed for various selections during
+          backup, restore and volume migration.
+
+        * Added automatic conversion of V4 installations.
+
+        * Added V4 -> V5 archive index conversion utility.
+
+        * Added read-only access to V4 backup indexes.
+
+        * Fixed auto-update for B2Go workstations.
+
+2013-12-09 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.0.7 released.
+
+        * Improved lookup selection handling to cover very large
+          selections (>1GB).
+
+        * Fixed database repage to limit the output database to
+          64K if the blocksize of the filesystem where the
+          database is located exceeds the 64K limit.
+
+        * Fixed volume migration.
+
+        * Changed import of archive volumes to place each imported
+          volume in its own separate index.
+
+        * Fixed B2Go handling of reference snapshots.
+
+        * Fixed reporting job IDs in volumes, for the first volume
+          in the chain in case of backup/archive and for all but the
+          last volume in case of restore.
+
+2013-11-20 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.0.6 released.
+
+        * Fixed filesystem device ID handling to honour cases where
+          device ID may be the same 16-bit value for two different
+          filesystem, thus invalidating incremental saves.
+
+2013-11-12 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.0.5 released.
+
+        * Improved index performance, both archive and backup.
+          During startup or latest before first archive and/or
+          backup operation, the index conversion is attempted.
+          The conversion routine locks the index for writing
+          so all backup/archive jobs started while the conversion
+          is still running, will stall.
+
+        * B2Go backup stops if the available space on the
+          filesystem where repository is pointing to drops
+          below 10%.
+
+        * B2Go snapshot purge attempts to randomize order
+          of the workstations being purged.
+
+        * Assure no reference snapshots for HFS-based
+          snapshot emulation in B2Go are purged or deleted.
+
+        * Restore to relocated location now makes sure the
+          place where to restore is created if not found.
+
+        * Fixed occasional crash when accessing library.
+
+        * Fixed browsing the index when data retention times
+          are set beyond 2038.
+
+        * Added support for Linux WingFS version.
+          Needs WingFS Build 77 or later.
+
+        * Fixed wizard file selection for Windows.
+
+2013-08-30 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.0.4 released.
+
+        * Fixed incremental backup on Linux/Solaris
+
+        * Added index correction routine for fixing
+          visibility of directories for given snapshot.
+
+        * Full backups now just add new addresses instead
+          of adding all new elements into the index.
+
+2013-08-01 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.0.3 released.
+
+        * Fixed handling of backup indexes that may
+          get improperly closed.
+
+        * Fixed generation of lookup selection when
+          running increment backups for paths that
+          have never been saved on media.
+
+        * Fixed indexing of root directory.
+
+        * Fixed ArchiveSelection for Windows.
+
+2013-07-17 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.0.2 released.
+
+        * Corrected incremental backup and archive on
+          Windows.
+
+        * Improved autoinstallation for libraries that do
+          no deliver serial numbers.
+
+        * Corrected restore in Windows.
+
+        * Corrected restore when selecting a folder structure
+          in Windows.
+
+        * Corrected display of bread crumbs when browsing
+          the index of a Unix host on Windows.
+
+2013-05-27 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.0.1 released.
+
+        * Fixed backup index recovery routine.
+
+        * Removed index/database check and repair.
+
+        * Corrected archive indexer to properly index
+          whole job tree with the current backup time
+          as to be able to browse the selected job only.
+
+        * Mac installer now installs preference pane.
+
+        * Corrected manual archive for files located on
+          filesystems having blanks in the mount point.
+
+        * GUI cosmetics.
+
+        * Corrected detection of Quantum DXi library
+          drive serial numbers / autoinstallation.
+
+        * Corrected detection od disk volumes when drive
+          is detached/replaced.
+
+        * Expaned default PATH to include alternative
+          binary directories.
+
+        * Corrected cross-client restore.
+
+        * Added automatic labeling to single tape drive wizard.
+
+        * Fixed lookup selection handling when running backups
+          with file statistics turned on.
+
+        * Added compatibility logic for running different backup
+          levels on different pools.
+
+        * Fixed creating custom roots over file-picker interface
+          in archive indexes during manual archive.
+
+        * Assure saving of the backup index runs after each backup
+          job, regardless of its outcome.
+
+        * Fixed creation of user-defined archive index meta fields
+          having mixed case or colliding with internal columns.
+
+        * Fixed preview creation on Windows.
+
+        * Added VSS logging for better VSS problem detection.
+
+        * Corrected VSS snapshot release on Windows.
+
+2013-03-30 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.0.0 released.
+
+2013-03-21 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 5.0.0 seed.
+
+2013-01-27 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.4.7 released.
+
+        * Fixed a seldom race condition when using cloning
+          with multiple jobs where a new job interrupts
+          the running ones due to incorrectly detecting
+          and reporting disparate tape positions.
+
+        * Added new CLI command "Job completed" which returns
+          all completed jobs for last number of days.
+
+        * Fixed leaking temporary files during preview
+          generation on Xinet volumes.
+
+        * Improved temporary directory cleanup on clients.
+
+        * Fixed broken CLI command "SyncpPlan targetpath".
+
+        * Fixed queries with values holding ampersand characters.
+
+        * Fixed creating parent directories in Windows for restores
+          of single files.
+
+        * Fixed import of disk volumes on Windows (rename error).
+
+2012-12-05 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.4.6 released.
+
+        * Enforce reindex of B2Go workstation repository
+          in case there is some error while re-connecting
+          linked directories during snapshot creation.
+
+        * Omit processing of .DesktopIndex file for Helios.
+
+        * Fixed manual starting of archive plans.
+
+        * Fixed auto-reschedule of archive plans in case
+          some calendar events were modified.
+
+        * Add weekly cleanup of temporary directory for
+          clients that are not auto-restarted.
+
+        * Ignore access to deleted elements in config iterators.
+
+        * Fixed CLI [Job warning] and [Job failed] commands.
+
+        * Fixed memory and handle leak in Windows.
+
+        * Fixed clashing with other products due to opened
+          tape library in a background (heartbeat) thread.
+
+2012-10-19 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.4.5 released.
+
+        * Added recognition of Hyper-V on Windows.
+
+        * Fixed long start-up times in case of disappeared disk storage.
+
+        * Fixed the "kIOReturnNoResources" when communicating with the
+          drive in OSX.
+
+        * B2Go cleanup routine startup can now be disabled so users can
+          schedule the routine per CLI-call when they need.
+
+        * Fixed CLI RestoreSelection command that restored only the last
+          selected entries.
+
+        * Fixed migration when PresSTORE is installed in a path with a
+          blank in it.
+
+2012-09-17 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.4.4 released.
+
+        * Fixed Windows B2Go server problem "-type l".
+
+        * Fixed saving of links on Windows when they already exist on
+          the file system.
+
+        * Optimized taking library inventory.
+
+        * Changed policy when a volume is set to recyclable. Expired
+          volumes are no longer considered for writing, regardless of
+          their fill state.
+
+        * Fixed import of volumes from older configs which were
+          marked DeletePending
+
+        * Added scrollbars for FilePicker as to allow display of large
+          fileserver volume collections.
+
+        * Improved CLI restore for large number of singleton files.
+
+        * Fixed virtual OS recognition for Parallel's hypervisors.
+
+2012-07-17 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.4.3 released.
+
+        * Fixed autocorrection of OS path for installed devices on OS X.
+
+        * Worked around OS deficiency leading to open error for devices
+          when working with multiple devices simultaneously.
+
+        * Fixed mail notification on Windows.
+
+        * Improved sorting on "Location" field in volumes list.
+
+        * Worked around latencies in the file system on Windows
+          that started appearing lately causing problems with
+          renaming temporary files after restore and at start-up
+          when attempting to create the "temp" directory.
+
+        * Fixed remote client update on Unix that was broken due
+          to changes/fixes for Windows.
+
+        * Fixed job history listing that was returning insane
+          values after applying 4.4.2 patch update.
+
+        * Fixed timing issues in backup jobs waiting for the
+          save index jobs that caused backup jobs to wait forever.
+
+        * Fixed conf database to properly handle volatile keys.
+
+        * Fixed "Cannot create finder" problem due to a double-quote
+          in the name field of the filter.
+
+        * Fixed FS event handling on Linux.
+
+2012-07-03 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.4.2 released.
+
+        * Fixed handling of volume barcodes that look like octal numbers.
+
+        * B2Go autoUpdate now triggers on any SW version difference
+          between the server and the client.
+
+        * Allowed re-import of old pre-V4.4 databases by simply deleting
+          the new SQlite resources.db file(s).
+
+        * Fixed large-file copies between client and server that caused
+          Sync to fail on larger directories.
+
+        * Added cloned volume display in GUI.
+
+        * Fixed updating to V4.4 with standalone tape-drives.
+
+        * Added new commands to CLI ArchiveSelection and SyncSelection
+          so users can register asynchronous job activation and completion
+          callbacks.
+
+        * Aded new commands to CLI Server object to examine last begin, end
+          and the next run of the workstation backup job.
+
+2012-06-21 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.4.1 released.
+
+        * Fixed installation of tape libraries on Windows.
+
+        * Fixed problem with replacting files with ^Z in their
+          names to Windows machines.
+
+        * Fixed submission of Archive jobs over CLI.
+
+        * Removed some unsupported/unused CLI commands.
+
+        * Relaxed restrictions on resource names so we can
+          update older installations less painfully.
+
+        * Fixed JS script eval on Windows Internet Explorer 9.
+
+        * Removed Windows Internet Explorer 8 as a supported browser.
+
+        * Fixed installing tape libraries and drives on Sun.
+
+        * Fixed creation of new databases with / as root path on Windows.
+
+2012-06-04 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.4.0 released.
+
+2012-05-08 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.3.7 released.
+
+        * We now recognize when running on a paravirtualized
+          Xen guest OS.
+
+        * Added configurable timeouts and connection settings over
+          environmental variables for nsdchat utility.
+
+        * Improved handlig of EOF on CLI connections on the server
+          for named-pipe connections.
+
+        * Fixed meta-data seach in Archive Index when conducted
+          from the root of the index.
+
+        * Fixed deadlock between CLI jobs and other jobs
+          connecting to a client.
+
+        * Added logging of external script errors into
+          PresSTORE's system log, e.g. from preview generation.
+
+        * Corrected detecting alerts form tape drives,
+          e.g. cleaning.
+
+        * Helped Tandberg fix setting EOM improperly rendering
+          tapes being prematurely filled.
+          Tandberg has released a new Firmware.
+
+        * Helped HP detect and fix a problem of writing
+          partial blocks to tape, while reporting to
+          have written them correctly, rendering faulty
+          tapes and contents.
+
+2012-03-26 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.3.6 released.
+
+        * One volume from a clone pair is no longer prematurely
+          set to be recycled in case where they are blocked
+          due to a progressive policy.
+
+        * Corrected Windows Sync where files could under certain
+          circumstances not be deleted on the target.
+
+        * It will no longer be attempted to complete a job when
+          a tape is encountered with a hard write error, since
+          many blocks can be lost and it is not possible to
+          determine which ones and recover.
+
+        * Aditionaly to checking for the existance of the nsd
+          service, its pid is checked before it is terminated
+          by the watchdog on Windows. This is to avoid killing
+          a same named foreign process.
+
+        * Fixed ability to log in with user names with special
+          characters and e-mail notifications related to such
+          users, e.g. Administratör.
+
+        * Fixed crash due to some kinds of dirlinks on Windows.
+
+        * Removed potentially inacurate total-size calculations
+          on per-workstation and per-template in Backup2Go.
+
+        * Added CLI commands for reporting snapshots and
+          calculating snapshot sizes for Backup2Go.
+
+        * Improved handling and garbage collection of expired
+          emulated snapshots in Backup2Go.
+
+        * Fixed filter issue on excluding filters in conjuction
+          with size and/or modification times where we (wrongly)
+          applied the filter on directories whereas the user
+          explicitly selected files.
+
+2012-01-19 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.3.5 released.
+
+        * Corrected CLI Archiv job submission bug introduced
+          by the previous patch.
+
+        * Corrected storage of encrypted files in B2Go to
+          always save the encryption header.
+
+        * Corrected race-condition in archive indexer when
+          two or more different jobs to different clients
+          produced index entries for the first job that
+          created the indexer thread.
+
+2012-01-09 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.3.4 released.
+
+        * Simplified B2Go statistic generation.
+
+        * Corrected occasional problems where log mails
+          could not be sent by terminating jobs.
+
+2011-12-23 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.3.3 released.
+
+        * Fixed B2Go interval setting when there was
+          a day-change between start and end times.
+
+        * License maintenace time is now unbound from the
+          software build time.
+
+        * Fixed B2Go statistic calculation when there are
+          some invalid index files.
+
+        * Fixed handling of usernames with embedded blanks
+          on Windows for B2Go logins.
+
+        * Fixed checking users with blanks in names for
+          administrator privileges.
+
+        * Fixed "device is writing" and "unknow command sdev*"
+          problems when exchanging tapes when writing.
+
+        * Fixed expiration date wraparound for expiration that
+          ranges beyond year 2038.
+
+        * Fixed windows startup when several lexxsrv.XXXX
+          were avaialable in the config folder.
+
+2011-12-12 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.3.2 released.
+
+        * Fixed statistics display for B2Go.
+
+        * Fixed filtering of directory structures for CLI jobs.
+
+        * Fixed long path name problem in B2Go repository on Windows.
+
+        * Prevented collision between snapshots purge routine and
+          workstation backups in B2Go.
+
+        * Fixed proxy initialization which in some cases resulted
+          in some necessary libraries not properly loaded.
+
+2011-12-01 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.3.1 released.
+
+        * Fixed handling of Bonjour-configured servers
+          during B2Go restores.
+
+        * Added support for pre-calculated previews and
+          metadata for archives.
+
+        * Fixed deletion of non-Xinet compatible folders
+          located under Xinet volumes.
+
+        * Corrected virtual library open/label on Mac.
+
+        * Corrected rare crashes on Linux when attempting
+          to locate optional fileserver products.
+
+        * Changed incremental backup lookup index creation
+          to fix problem where we were saving too much files
+          during alternating backups.
+
+        * Added internal timed cache for username/password
+          checks to cope with bogus Linux PAM implementations
+          that slow down when running more than 100 requests
+          over the same PAM object.
+
+        * Fixed "read over upper boundary" error and connection
+          loss problem involving Windows.
+
+        * Fixed occasional job termination when attempting to
+          replacing tapes in the drive(s) once they are full and
+          no further tapes are available. Problem often presented
+          when cloning was turned on, although it was not associated
+          with cloning.
+
+2011-11-15 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.3.0 released.
+
+2011-09-26 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.2.4 released.
+
+        * Added expert option for B2Go to allow manipulating
+          the index-rebuild frequency.
+
+        * Work around LSI Linux driver problem with LTO-5 drives
+          during labeling.
+
+        * Work around the LTO-5 problem, where it does not report EOM
+          when full, so no exchange of tapes takes place.
+
+        * Corrected single/removable drive script calling after eject,
+          the drive would not un-mount since the disk file was still in
+          use.
+
+        * Corrected Windows B2Go client ("can't create '/' directory"
+          message)
+
+        * Corrected lockup ("waiting on writabe buffers" message).
+
+        * Improved parsing of Netatalk volumes file.
+
+        * Fixed handling of modification time for Xinet resource forks.
+
+        * Set Netatalk default character encoding to UTF8-precomposed.
+
+        * Corrected overshadowing in the index due to a double slash
+          in the path for windows when the root path (for example /C
+          or ALL) is  used.
+
+        * Fixed index restore that failed to uncopress index chunks
+          restored from the media.
+
+        * Fixed internal filter expressions related to reserved directories.
+
+2011-07-22 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.2.3 released.
+
+        * Renamed a shared library that would prevent server
+          startup on Mac 10.7 (Lion) release.
+
+        * Corrected stop-time handling for jobs repeating
+          several times per day.
+
+        * Fixed startup problems on some Macs where Bonjour
+          library fails to initialize.
+
+        * Resolves deadlock caused by the index backup job
+          when there is a limit of clients per stream.
+
+2011-06-22 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.2.2 released.
+
+        * Increased timeout on ZFS snapshot manipulation
+          commands to cope with slow(er) configurations.
+
+        * Fixed incremental backup that was re-saving files
+          when only file metadata (not content) was changed.
+
+        * Ignore and log files with bogus filepaths during
+          snapshot merge in B2Go.
+
+        * Improved handling of B2GO snapshots when snapshots
+          are being modified and/or deleted from the outside.
+
+        * Fixed GUI for installing new tape libraries.
+
+        * Fixed Windows SCSI driver to handle iSCSI connections.
+
+        * Worked around firmware bug for labeling new tapes for
+          IBM LTO-5 drives.
+
+        * Workarround symlink problems when merging B2Go snapshots.
+
+        * Client auto-update is now allowed/set per default.
+
+        * Fixed server-side adjusting of CPU throttle for B2Go.
+
+        * Fixed file-picker for B2Go "Restore To ...".
+
+        * Added provisions for using RDX and other removable drives.
+
+2011-05-30 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.2.1 released.
+
+        * Fixed search in archive index when new date-pickers
+          are not exposed in the GUI.
+
+        * Fixed toggle of the post-script execution flag after
+          the archive plan ends with error.
+
+        * Fixed deletion of files in B2Go when same files are
+          being created and deleted accross snapshots.
+
+        * Fixed usage of paths with embedded blanks as B2Go
+          repository.
+
+        * Fixed sending email notifications on some platforms.
+
+        * B2Go snapshot usage is now calculated on snapshot
+          creation and cached on per-workstation basis.
+
+        * Fixed broken Job monitor display when there are B2Go
+          jobs running.
+
+        * Fixed operations employing VSS for Windows.
+
+2011-05-16 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.2.0 released.
+
+2011-04-11 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.1.6 released.
+
+        * Back-ported de-selection of the unique index path
+          in archive, as partially supported option for rare
+          expert users.
+
+        * Fixed bug where we were unable to suppress preview
+          generation during archive, even if there was no
+          user-preview generator defined nor any sizes for
+          pixel count (still images) or clip-length (movies)
+          were specified.
+
+        * Fixed migration of some older archive volumes.
+
+        * Volume import can now be configured to sequentially
+          scan the tape instead of using pre-calculated index
+          found on the tape.
+
+        * Force re-setting of target file mtime during Sync
+          on Mac OSX 10.6 as the OS wildly re-sets modification
+          time of restored files which were already copied,
+          closed and their inode data set correctly.
+
+2011-02-25 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.1.5 released.
+
+        * Implicitly enable or disable progressive backup
+          depending on existence of the full backup schedule.
+
+        * Explicitly adjust Win socket buffer size to 64K+1
+          to get maximum speed when operating cross-platform.
+
+        * Fixed file-descriptor leak in Sync when linking new
+          cycles.
+
+        * Improved Backup2Go purge routine to prune partially
+          referenced snapshots.
+
+        * Corrected calculation of lists of volumes to keep
+          for files that were deleted in the meantime.
+
+2011-01-27 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.1.4 released.
+
+        * Fixed large memory leak on Windows
+
+        * Fixed deletion of old sync cycles on Xinet volumes
+
+        * Volume recycle date is now not being extended for
+          files found to be deleted during the increment backup.
+
+        * Sync cycles generated with links now properly setup
+          protection and owner of directories.
+
+        * Fixed handling of filesystem events in conjunction with
+          synchronize jobs configured for multiple sources.
+
+        * Archive index purge now omits cleaning empty directories
+          which are saved on existent media volumes.
+
+        * Improved B2Go snapshot purge routine.
+
+        * Tape labeling now handles situation where very first
+          block on the tape is a filemark.
+
+        * Fixed reading of blocks with different sizes from one
+          media volume.
+
+        * Linux machid now omits some special network interfaces
+          containing bogus hardware addresses.
+
+        * Fixed race-condition between two or more jobs working
+          in parallel on one archive index.
+
+        * Fixed archive from remote clients when user-defined
+          preview generator is defined.
+
+2010-11-16 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.1.3 released.
+
+        * Fixed changing Host ID on multihomed linux hosts.
+
+        * Fixed handling of full and increment backups done on
+          different media pools.
+
+        * Fixed "file truncated" errors while reading encrypted
+          files from remote clients.
+
+        * Fixed Solaris scatter-gather network write to limit
+          the number of buffers sent in one write operation.
+
+        * Improved job scheduler to cope with machines going
+          into sleep mode.
+
+        * Fixed client/server communication making the server
+          properly send EOD packets at the end of data transfer.
+
+        * Improved archive and backup index cleanup by heavily
+          caching index layout in memory.
+
+        * Improved network bandwidth throttle calculation
+          to better handle very slow networks.
+
+        * Fixed snapshot purge to skip deleting referenced
+          directories.
+
+        * Improved snapshot generation on non-ZFS filesystems
+          to be more tolerant on stale symlinks.
+
+        * Fixed read-mounting of ZFS snapshots.
+
+        * Fixed linux crash on large SCSI-bus scans.
+
+        * Extended the waiting time for libraries with elevators
+          (like Tandberg T160).
+
+        * Fixed Service Functions for Windows Service Manager.
+
+        * Fixed volume migration.
+
+        * Forbid starting the sofware on Unix systems without
+          the "en_US.UTF-8" locale installed.
+
+2010-10-25 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.1.2 released.
+
+        * Fixed snapshot creation if some snapshots were
+          prematurely deleted.
+
+        * Forbid creation of resources containing
+          special characters.
+
+        * Fixed labeling of disk volumes.
+
+2010-10-23 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.1.1 released.
+
+        * Fixed inclusions of user-defined filters for B2Go.
+
+        * Fixed handling of large integer values in
+          job reports.
+
+        * Fixed license handling for version 4.1 and
+          updates from V4.0.
+
+        * Fixed and improved network bandwidth reduction
+          calculation to better handle very slow networks.
+
+        * User notifications are now per default enabled
+          and filled with all known notification events.
+
+2010-10-19 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.1.0 released.
+
+2010-09-27 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.0.3 released.
+
+        * Fixed deletion of versions directory on Sync cycle change.
+
+        * Fixed translation of Helios special-escaped characters.
+
+        * Fixed creation of volumes with different blocksizes
+          within one pool.
+
+        * Fixed markup of deleted elements in backup index.
+
+        * Added persistent FSEvents store for filesystems where
+          Apple's fseventsd is unable to maintain its database.
+
+        * Fixed volume recycling for everlasting increments.
+
+2010-08-30 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.0.2 released.
+
+        * Volume migration now allows migrating of volumes
+          whose followers are missing or disabled.
+
+        * Volume import now allows for scanning media-chunks
+          sequentially in case on-media chunk-directory file
+          is missing or empty.
+
+        * Tightened locking when calling externally supplied
+          (and most probably not MT-safe) routines.
+
+        * Improved interface to FSEvents on Darwin to manage
+          very slow event delivery.
+
+        * Fixed problems with filesystems that report optimal
+          IO-size which is not rounded to 8Kbytes.
+
+        * Prevent configuring illegal schedules that could cause
+          infinite loops while looking for the next schedule time.
+
+        * Corrected internal index problems when file names are
+          composed of special/control characters.
+
+        * Fixed bug in B2Go workstation where drop index flag was
+          not reset after successful index rebuild on the server.
+
+        * Re-index config and job databases on startup.
+
+        * Darwin build now uses same thread-based async SCSI-IO
+          as other platforms.
+
+        * Added new license package BOM
+
+        * Added new Darwin uninstaller application
+
+2010-07-12 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.0.1 released.
+
+        * Cycle generation with links enabled for Xinet.
+
+        * Fixed sync with events when event source host
+          was declared as empty.
+
+        * B2GO workstations do not attempt to re-create
+          index on every connection. Instead, index is
+          re-created either by user intervention (GUI)
+          or by certain destructive operations on the
+          server (snapshot deletion, repository change etc).
+
+        * Snapshot purge is now scheduled as detached
+          procedure at 3AM (subject to static configuration)
+          in addition to run at server startup.
+
+        * Fixed order of jobs displayed in the job monitor
+          to display the last done jobs first.
+
+        * Fixed archive volume migration when a cloned volume
+          is taken as a source.
+
+        * Fixed unsigned integer overflow in job report for
+          backups saving more than 4TB per drive.
+
+        * Fixed size filter.
+
+        * Fixed PresSTOREServiceManager for Windows.
+
+        * Fixed sync with blanks in source path.
+
+2010-06-22 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 4.0.0 released (The Shiny Release)
+
+2010-06-22 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 3.2.5 released.
+
+        * Backup and archive job tickets emit note when
+          filesystems holding backup/archive indexes approach
+          90% fill-grade.
+
+        * Improved deletion of B2GO snapshots by extensively
+          re-checking hard-linked references. This is now
+          more time-consuming but also more fault-tolerant.
+
+        * Fixed index save for Windows where we might
+          have saved temporary index chunks in addition
+          to the main chunk, which caused problem during
+          index restore.
+
+        * Fixed error-code over-shadow that caused us to
+          report timeout conditions as per-file POSIX
+          errors instead of terminating the operation.
+
+        * Changed default read/write timeout for Sync jobs
+          to 10 minutes.
+
+        * Fixed import of volumes when we could drop files
+          from the very last incomplete index chunk.
+
+        * Fixed import of volumes which failed under some
+          unknown circumstances by having files with embedded
+          CR (\r) characters.
+
+2010-04-01 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 3.2.4 released.
+
+        * Fixed bug in B2GO when snapshot deletion may
+          delete random files in the server' repository.
+
+        * Do not write into B2GO repository if the underlying
+          workstation directory is missing.
+
+        * Added option of limiting concurrent number of B2GO
+          template users. Currently only CLI manipulation is
+          supported (see 'Backup2Go maxrunning' CLI command).
+
+        * Removed usage of nsproxy for VSS.
+
+        * Corrected SFM translations for special characters.
+
+        * Corrected SFM resoucre fork name case sensitivity
+          (Permission denied error).
+
+        * Allow logging of administrator users even when the
+          generic template is set to disabled.
+
+        * Wait for existence of conf and/or index directories
+          if they were linked/relocated on some other disks
+          that are not available at software start/init time.
+
+        * Fixed nsdchat CLI inventory command.
+
+        * B2GO jobs do not create permanent job ticket any more.
+
+2010-02-19 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 3.2.3 released.
+
+        * Fixed event processing for Sync runs.
+
+        * Improved recycling in single drive.
+
+        * Corrected handling of non-ntfs file systems on Windows.
+
+        * Corrected Windows installation - the not installing
+          microsoft redistributable libraries.
+
+        * Improved Windows handling of lookup indexes.
+
+        * Improved job finalization on Windows, rename of index directory.
+
+        * Corrected saving the empty mount point.
+
+        * Corrected deleting deep direcotries upon full sync on Windows
+          that presented itself as a connection abort.
+
+        * Still needs correction - remote installing Windows. The installation
+          runs through but does not automatically restart.
+
+2010-01-22 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 3.2.2 released.
+
+        * Added more logs when attempting to generate
+          previews during archive.
+
+        * Added wizzard-supported B2GO workstation setup.
+
+        * Added support for Xsan2.2.
+
+        * Added cli::tests::disk::readwrite and
+          cli::tests:tape::readwrite commands to test
+          sequential speeds for disks and tapes.
+
+        * Corrected possible deadlock during multiple
+          changer backup when an attempt was made to
+          automatically recycle the volumes.
+
+        * Corrected Windows Host ID determination.
+
+        * Added Windows domain login.
+
+        * Corrected Windows ctime handling which caused
+          too many files to be backed up or synchronized.
+
+        * Improved backup and restore reporting and handling
+          when errors on files are determined during backup.
+
+        * Corrected Windows remote update procedure.
+
+        * Corrected unspecific crash in some cases when
+          directories had to be created on Windows.
+
+        * Improved collection of nsproxy processes on Windows,
+          which had prevented scheduled restarts.
+
+2009-12-04 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 3.2.1 released.
+
+        * Removed per-pool binding of increment backups.
+
+        * Fixed handling of extended attributes on Solaris
+          UFS so we do not overwrite the file's mtime.
+
+        * Fixed deletion of tilde-files on target during
+          the full sync.
+
+        * Removed rare deadlock when one job is mounting volumes
+          while another is unmounting them at the same time.
+
+        * Improved write speed for PresSTORE disk volumes.
+
+        * Corrected CLI Device inventory command.
+
+        * Corrected ctime handling for Sync on Windows.
+
+        * Correcred preview display in Archive on Windows.
+
+        * Corrected QuickTime startup on Windows.
+
+2009-10-25 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 3.2.0 released.
+
+2009-07-06 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 3.1.5 released. Changes since last release
+
+        * Automatic index backup now supports indexes which,
+          when compressed, exceed 4GB in size.
+
+        * Fixed potential deadlock on the archive database
+          during verify runs.
+
+        * Fixed backup index display when roots of the index
+          contain special path characters.
+
+        * Added workarround for Mac OSX 10.5.7 showing invalid
+          SCSIUserTask warnings that trash the system log file.
+
+        * Added workarround for Mac OSX 10.5.7 when resolving
+          users over directory service deamon.
+
+        * Fixed CLI for immediate starting of backup plans.
+
+        * Fixed caching of FileId's on Helios volumes when whole
+          directory structures are deleted and re-created under
+          the same name(s).
+
+        * Resolved startup problems on Windows when many network
+          interfaces are available.
+
+        * Prevented possible deadlocks during recycling when
+          multiple jobs are running in parallel on the same pool.
+
+        * Fixed "prefligt" checking of the tape positions
+          in drive before starting to save the content,
+          which could occasionally cause jobs to block.
+
+        * Fixed the virtual changer inventory function that
+          only partially determined the content after a
+          change of the folder holding the volumes.
+
+2009-04-30 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 3.1.4 released. Changes since last release
+
+        * Compatible with Helios and Sun RPC API to desksrv
+          (as with Helios CD24 distribution).
+
+        * Junction points are not traversed any more on NTFS.
+
+        * Fixed case when some jukeboxes fail to deliver
+          device capability page, so we can check which move
+          attempts are valid (like for Quantum i2000 units
+          with broken firmware).
+
+        * Fixed deadly embrace between jobs running archive
+          and restore at the same time from the same pool.
+
+        * Added symlink to /var/log that points to our private
+          logs directory (Darwin only).
+
+        * Fixed deadlock when pool is cloned and the drive
+          list is defined but the cloned drive list left blank.
+
+        * Fixed deadlock during automatic recycling.
+
+        * Fixed autoejecting full tapes in single drives.
+
+2009-03-31 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 3.1.3 released. Changes since last release
+
+        * Fixed race-condition when two or more backup jobs
+          are running on the same mouted pool and one of
+          the jobs exits regularily while other gets the
+          media exception (eom or other).
+
+        * Fixed MT-issue in new file-walker that causes us
+          to occasionaly hang while walking the filesystem.
+
+2009-03-24 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 3.1.2 released. Changes since last release
+
+        * Automatically handle invalid license types.
+
+        * Automatically convert some older jukebox configs.
+
+        * Added optional execution of the per-plan post-script
+          depending on the exit-status of the plan.
+
+        * Enforce wait on the client-update until the client is
+          operational again.
+
+        * Added some more extensions for which to generate previews
+          when using QuickTime library.
+
+        * Added option to skip runnung post-script for scheduled
+          plans if plan itself failed. This simplifies integration
+          in some workflow scenarios.
+
+        * Enforce cleanup of temp files after running the Sync job.
+
+        * Make sure /usr/sbin is in the PATH env variable on Solaris
+          so that we can rely on hitting the right "zfs" executable.
+
+        * Resolved potential deadlock in file-walk phase that blocked
+          full or incremental backups, depending on the system load.
+
+        * Added CLI option to set source/target paths for Sync plan.
+
+        * Make sure default archive database is accesible from the
+          web-root so we can display generated previews.
+
+        * Fixed Sync for folders containing multinational characters
+          when running on Solaris/Helios configurations.
+
+        * Fixed handling of door-events for jukeboxes under Solaris.
+
+2009-02-16 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 3.1.1 released. Changes since last release
+
+        * Fixed wrong workstation ID usage when remote workstation
+          record is deleted on the server.
+
+        * Fixed issues related to configuration database when
+          updating directly from V2.X to V3.1 w/o updating to
+          V3.0 first.
+
+        * Added MXF format in the list of supported video files.
+
+        * Improved compatibility to 3.0 clients when a backup plan
+          was running with file pre-scan option set.
+
+        * Fixed single drive use when the drive is entered into
+          the pool list of drives.
+
+        * Fixed EtherShare Desktop-handling in Linux distribution
+          when multiple desktop-requests were done simultaneously.
+
+        * Fixed some MT-issues related to new Linux kernels.
+
+        * Added directory XATTR/ACL support for directories created
+          under older Sync cycles created with hardlink option.
+
+        * Generic template for B2GO is now disabled if the mandatory
+          data-storage-directory parameter is not set.
+
+        * Jukebox wizzard exposes the list of all recognized drives
+          instead of showing only the potential match-candidate.
+
+        * Fixed preview generation and file deletion for archive jobs
+          when several parallel jobs are running against the same index.
+
+        * Fixed Solaris dev logging which was crashing the server when
+          enabled.
+
+        * Restore jobs no longer interfere with the backup jobs to cause
+          backup speed to drop.
+
+        * Automatic mount inventory is done only when the changer
+          signalizes that the door had been opened and the inventory
+          manipulated.
+
+        * The starting period for rechecking the availability of
+          resources is prolonged to reduce the interference with other
+          jobs and the process load.
+
+2009-01-15 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 3.1.0 released.
+
+2008-11-17 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 3.0.10 released. Changes since last release
+
+        * Disabled access to all login-areas that were previously
+          open for everybody. In order to allow non-administrative
+          users to access the login-area, the administrator needs
+          to explicitly assign groups that are allowed access.
+
+        * Disabled login for all new non-admin users by setting the
+          newly created user-preference record to Disabled. In order
+          to allow the non-administrative users to login into the GUI,
+          the admin must explictly enable the user-preference record.
+
+        * Fixed resolving of archive entry handles over CLI when
+          archiving with more than 1 device in parallel.
+
+        * Fixed pool deletion after all of the volumes that are
+          labeled for that pool are marked for deletion.
+
+        * Fixed deadlock in jukebox auto-mount-inventory with more
+          than 1 device involved.
+
+2008-10-29 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 3.0.9 released. Changes since last release
+
+        * Improved on VSS handling for Windows to avoid crash of
+          the entire application if OS goes wrong.
+
+        * Improved on virtual changer's handling of illegal files
+          in the changer's directoy.
+
+        * New licensed product packages
+
+2008-09-24 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 3.0.8 released. Changes since last release
+
+        * New licensed package for Tandberg
+
+        * Fixed internal buffer overflow when handling files
+          having UID/GID which does not translate to a known
+          user/group name.
+
+        * Fixed setting recycle date for volumes before they
+          get filled.
+
+        * Fixed parallel use of VSS and event processing on
+          windows clients.
+
+2008-08-29 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 3.0.7 released. Changes since last release
+
+        * Fixed update of Mac OS X 10.5+ clients.
+
+        * Added logdev debug level to better/simpler diagnostics.
+
+        * Fixed GID setting for non-admin restores.
+
+        * Fixed non-admin restore to paths with symbolic links.
+
+        * Removed disturbing mail message about unavailable drive
+          during synthetic backup
+
+        * Removed regexp-based filters for Darwin, filtering user
+          trash cans and caches, as this resulted in memory bugs.
+
+        * Fixed per-client file-encryption.
+
+        * Fixed archive runs on Helios/Solaris servers when files to
+          archive contained umlauts in the name and optional meta
+          data information has been specified.
+
+        * Adjusted parallelizing options for synthetic backup.
+
+        * Fixed race-condition in job scheduler that caused generation
+          of invalid job-queue entries, breaking GUI display.
+
+        * Fixed cycle generation for sync-plans operating within
+          fileserver volumes.
+
+        * Fixed handling of some older ADIC jukeboxes.
+
+        * Changed layout of AppleDouble files as stored on non-HFS
+          filesystems to be more compatbile with Apple's copyfile(3).
+          Also, use standard ACL/xattr API calls where possible and
+          fallbcack to AD attribute file when necessary.
+
+        * Fixed memory errors in Windows distribution, for example
+          during nightly restart.
+
+        * Fixed handling of long username/password combinations that
+          did not allow the user to log in.
+
+        * Updated AWManager for Windows to avoid deadlocks due to manual
+          configuration changes.
+
+        * Fixed remote installation for Windows.
+
+        * Fixed various issues related to installation directory paths
+          with embedded blanks.
+
+        * Fixed restore of configuration on Windows.
+
+        * Fixed import of a volume immediately after deleting it and
+          before restarting the application.
+
+2008-06-23 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 3.0.6 released. Changes since last release
+
+        * Fixed labeling in tape-drives currently in writing mode.
+
+        * Fixed deadlock when writing to cloned tape-drives.
+
+        * Removed per-node protection in index databases. The only
+          protection checking of index access is now done thru
+          testing of group membership in loginarea.
+
+        * Fixed crashing in Solaris/Intel port while sending email.
+
+        * Fixed jukebox handling in auto-mount-inventory when the
+          jukebox is reported busy or some other SCSI error happens.
+
+        * Added remapping of user and group ID's for local restores.
+
+        * Fixed problem with new Windows installation not able to
+          start due to problems with user rights.
+
+        * Corrected filters for Windows which now ignore the case
+          of the names in files and paths.
+
+        * Corrected handling of filters for the -path option.
+
+        * Corrected synthetic backup when more than one client are
+          being saved in the full backup.
+
+2008-05-20 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 3.0.5 released. Changes since last release
+
+        * Added private caching of users/groups to get optimal
+          GUI speed when running against large and slow Active
+          Directory installations.
+
+        * Archive preview generator made less strict about the
+          format of the jpeg images, allowing even truncated
+          jpeg files to be properly recognized and processed.
+
+        * Fixed application startup problems on older Win2003
+          server installations, where the OS bug caused us to
+          destroy the stack and exit without a trace.
+
+        * Fixed chained start of backup plans.
+
+        * Fixed startup of synthetic backups.
+
+        * Fixed volume mount inventory.
+
+        * Fixed checking of user/group membership on Windows.
+
+        * Fixed CLI BackupPlan client to properly return list
+          of clients saved by the named plan.
+
+        * Jukebox heartbeat thread polling frequency can now be
+          adjusted by adding the following ns_section/ns_param
+          commands to the server configuration file:
+
+              ns_section ns/libarchdev
+              ns_param jbhbeat 10
+
+          Above sets the polling frequency to 10 seconds.
+          Default is 5 seconds. To disable the jukebox monitoring
+          completely, set the jbhbeat parameter to 0 seconds.
+
+2008-04-30 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 3.0.4 released. Changes since last release
+
+        * Disables potential man-in-the-middle attacks on Web-GUI
+          by somebody stealing and reusing encrypted usernames
+          and passwords.
+
+        * Fixed backup weekly schedule calculation when first run
+          of the plan is set in the future and overlaps with the
+          selected schedule for that day.
+
+        * Fixed backup scheduler to cope with time-shift of jobs
+          that eventually start later then configured, due to
+          excessive system load.
+
+        * Job monitor text for backup jobs now contains the
+          level information ( Re-added due to popular demand ).
+
+        * Save jobs hitting the media error during writing will
+          mark the current media as suspect and continue on the
+          next available appendable volume in the pool.
+
+        * Media manager now attempts to locate next suitable
+          volume for writing even if the jukebox inventory is
+          found invalid and calculated writable volume from
+          the pool cannot be mounted.
+
+        * Backup task now does not reserve volumes used by the last
+          full backup plus all subsequent increments. Recycling of
+          such volumes is now only subject to retention time as
+          specified per backup plan.
+
+        * Added persistent jukebox monitor thread that registers
+          all unusual jukebox events, like setting the unit offline
+          or opening jukebox doors. Such events are used to trigger
+          automatic jukebox barcode inventory.
+
+        * Added etc/sendmail.applescript to send email on Mac OS X
+          workstations w/o configured Postfix mail server.
+
+        * Improved cancellation of long-running jobs on remote clients.
+
+        * Automatically invalidate and rebuild backup lookup indexes
+          when volumes get recycled or deleted.
+
+        * Fixed MT-unsafe handling of mounted filesystems lookup on
+          Linux servers.
+
+        * Corrected some Japaneese translations.
+
+        * Added Pool column in the Volume listing.
+
+        * Added shortcut to standalone tape devices in the toolbar.
+
+        * Removed aftermath changing of virtual jukebox geometry.
+          In order to change virtual jukebox geometry, the device
+          needs to be deleted and re-created again.
+
+        * Removed Pool selection from extended search options for
+          backup and archive indexes.
+
+2008-04-07 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 3.0.3 released. Changes since last release
+
+        * Fixed sending test mail from within user preference.
+
+        * Added new SUA users in the supported licenses database.
+
+        * Fixed protection of resource groups in the configuration
+          database that prevented non-root users to submit restore
+          and/or archive jobs.
+
+        * Added QuickStart help item which attempts to simplify
+          first-time experience when evaluating the product.
+
+        * Automatically recycled volumes are not set to Suspect.
+
+        * Volumes blocked by the current cycle are released after
+          a new full backup.
+
+        * Fixed daylight time saving for scheduled backup jobs.
+
+        * Fixed licensing of virtual disk devices within a jukebox
+          so they dont steal license units from real media drives.
+
+        * Filter volumes marked for deletion from the volume list.
+
+        * Fixed taking inventory after recycling volumes.
+
+2008-03-20 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 3.0.2 released. Changes since last release
+
+        * Fixed memory leak and potential memory trash in Mac OS X
+          acl_to_text() library call as it is broken since 10.4 up
+          to the 10.5 OS X version.
+
+        * Fixed race condition in backup indexer when two or more
+          job executors may deadlock when attempting to release
+          the indexer thread.
+
+        * Disabled error-counters inquiry for HP Ultrium-4 devices
+          as some of them have broken firmware.
+
+        * Fixed broken Intel/Solaris distribution which failed to
+          load on some Solaris10 buidls.
+
+        * Mail sender/server setting done in the configuration file
+          are now automatically joined in the configuration of the
+          localhost machine, so they are visible in the GUI.
+
+        * Added support for relocatable Desktop databases for Helios
+          EtherShare fileserver.
+
+2008-03-03 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 3.0.1 released. [The Two-Years-After Release]
+
+2008-02-20 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.3.16 released. Changes since last release
+
+        * Fixed Unix distributions as some were compiled wrongly.
+
+2008-02-18 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.3.15 released. Changes since last release
+
+        * Fixed start-at-boot on Mac OS X broken by the previous
+          patch release while moving startup machinery to launchd.
+
+        * Fixed memory leak when saving or restoring files with
+          total path length larger than 200 bytes.
+
+        * Improved restore selection to early skip files located on
+          recycled volumes.
+
+        * Fixed media reservation problem that caused parallel saves
+          to fail under some circumstances.
+
+        * Back-ported disk driver from the V3 including new faster
+          compression algorithm and automatic volume-repair option.
+
+2008-01-17 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.3.14 released. Changes since last release
+
+        * Fixed hangs in Sync control channel, happening with some
+          high-speed and high-latency WAN links.
+
+        * Reduced timeout while establishing reverse client connection
+          from 86400 to 120 secs in order to quickly recover from
+          temporary client problems.
+
+        * Switched to use launchd on Mac OS X 10.5.
+
+        * Fixed preview generation using QuickTime on Max OS X 10.5
+
+        * Fixed inventory in jukebox without a barcode reader when
+          volumes have not been previously labeled
+
+        * Prevents TCP socket leaking on reverse client connections
+          during sync.
+
+2007-11-22 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.3.13 released. Changes since last release
+
+        * Fixed backup task scheduling for plans saving more
+          than one client, where one client backup runs longer
+          than one day, whereas other client backup is done
+          fairly quickly. In such cases the quicker backup may
+          be re-scheduled using wrong startup time.
+
+        * Fixed remote agent timeouts when generating large
+          Sync cycles.
+
+        * Synthetic backups now use unnamed pipes instead of TCP
+          socket pairs to join restore and backup jobs. This speeds
+          up the process and consumes less system resources.
+
+        * Added Mac OS X (Intel) support for Xinet desktops.
+
+        * Fixed download of files outside fileserver volumes on Mac OSX.
+
+        * Extended "Job xmlticket" CLI command to allow one optional
+          argument specifying the path of the file where XML job ticket
+          data should be stored.
+
+        * Prevent server restarts if there are very long running script
+          executions underway.
+
+        * Fixed problems related to scanning file systems with exotic
+          characters on Windows.
+
+        * Fixed problems related to index corruption when running
+          an incremental backup on localhost on Windows.
+
+        * Do not act on hard read/write errors as reported from tape
+          drives. Instead just log the event in the system log.
+
+        * Fixed SCSI device recognition on SuSE 10.3 Linux as the format
+          of the /proc/scsi/scsi report changed.
+
+        * Avoid using "ConsoleMessage" alias on Mac OSX 10.5 (Lepopard)
+          in startup scripts, as this isn't defined any more.
+
+2007-09-03 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.3.12 released. Changes since last release
+
+        * Added additional checking for session-ID in HTTP sessions
+          between the clients and server, suppresing any potential
+          session-ID reuse.
+
+        * Added retry on control channel for communication errors
+          during synchronize.
+
+        * Fixed recognizing users belonging to admin group on Mac
+          by additionaly iterating over all known groups, instead
+          of just fetching the group in question by getgrnam()
+          library call. It seems to deliver incomplete list of
+          group members in some rare cases.
+
+        * Fixed locating data in index on Windows 64bit installations.
+
+        * Fixed synchronizing and resynchronizing paths with special
+          characters on Windows.
+
+        * Fixed closing volumes from different clients of the same job
+          when "Use new volumes" is chosen.
+
+        * Fixed proxy command server when running commands for usernames
+          longer than (or equal to) 6 characters. This resulted in some
+          files not being deleted although archive jobs were configured
+          for file deletion.
+
+        * Fixed handling of double-fork Xsan Mac files when the corresponding
+          resource-fork could not be opened for reading or otherwise
+          recognized. This resulted in files not being saved nor reported
+          during incremental backups.
+
+        * For backup jobs running on 2 or more devices, the total job
+          status is set to "exception" when at least one of the job
+          executors ran in error. Only if all job executors finished
+          without errors, the job status is set to "completed".
+
+        * Added "cli::index::backup::synchronize" CLI command to sync
+          the backup index of the remote client with the actual state
+          of the filesystem in cases where files deleted from the
+          filesystem were not correctly marked in the index.
+
+        * Download of support data now includes all compressed copies
+          of system.log file on Mac OS X.
+
+        * Fixed volume import of volumes created using synthetic backup.
+
+2007-07-09  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.3.11 released. Changes since last release
+
+        * Fixed display of dataset sizes larger of 4TB during backup,
+          synchronize and/or restore operations.
+
+        * Fixed duplication of archive, backup and sync plans not to
+          duplicate the handle of scheduled job and thus prohibiting
+          schedule and startup of the newly duplicated plan.
+
+        * Fixed compatibility with Internet Explorer V7 on Windows.
+
+        * Simplified handling of desktop database update for Helios
+          servers. In some cases during the sync when files are changed
+          and copied to the target directory, we unnecessarily adjusted
+          the ID of the parent directory which sometimes lead to dup IDs.
+
+        * Filter out system and library cache and virtual memory files on
+          Darwin so they do not get synced, archived or backed up.
+
+        * Fixed preview generation on remote clients when path to preview
+          file contained "+" character.
+
+        * Virtual jukebox wizzard adds two media devices per unit instead
+          of just one, thus allowing synthetic backups to be run on one
+          jukebox unit.
+
+        * File download always generates Mac OS X compatible zip files.
+
+2007-05-25  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.3.10 released. Changes since last release
+
+        * Fixed open-file leak when archiving Xinet volumes
+          containing bogus (zero-length) resource files.
+
+        * Enforce cloned volumes are always written in pairs even
+          when the pool has been re-configured to disable cloning.
+
+        * Added automatic repair of inproperly closed disk-volumes.
+
+        * Changed handling of connections to Helios desksrv. Instead
+          of testing the connection with a dummy GetDeskCharset() call
+          which proved to be problematic and was causing the desksrv
+          to freak out sometimes, we now deliberately run into error
+          when running against a stale connection. On certain set of
+          errors we re-try the connection to desksrv and re-try the
+          failed operation once more.
+
+        * Fixed reserving the oldest written volume for writing
+          first, in case drives are explicitely assigned to the pool.
+
+        * Added new DLT device types to choose from when installing a
+          changer.
+
+        * Fixed job stophours processing when the very first backup
+          of a plan was cancelled.
+
+        * Fixed job auto-cancellation timing when no job monitor
+          was running during job execution.
+
+        * Added CLI tests for measuring network speeds.
+
+2007-04-11  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.3.9 released. Changes since last release
+
+        * Fixed ACL handling for directories during sync and restore.
+
+        * Changed handling of connections to Helios desksrv. Instead
+          of tearing down the connection each idle seconds, we cache
+          the connection indefinitely. On re-use, the connection is
+          tested and if stale, newly established.
+
+        * Corrected job re-scheduling in between switch to and from
+          daylight saving time.
+
+        * Corrected suppressing recycling of volumes when a backup job
+          backs up more than one host.
+
+        * Corrected Windows deadlock during thread synchronization for
+          multiple jobs.
+
+        * Fixed jukebox handling for some Spectralogic units that
+          failed to report a correct element-move-matrix.
+
+        * Fixed starting the software under non-privleged user.
+
+        * Supressed errors about new/existing symbolic link existence
+          on the target of a sync plan when running on Mac OSX
+
+2007-03-15  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.3.8 released. Changes since last release
+
+        * Added XML-formatted job ticket delivery for CLI.
+
+        * Resolved conflict with different file-type during the
+          sync by making a new version of the target file.
+
+        * Sync with delete will overwrite any exiting target files
+          whose modification dates differ from the source.
+
+        * Resolved deadlock on archive databases when one user was
+          in the middle of search query preparation while some other
+          was about to mount the database.
+
+        * Improved reservation of volumes during synthetic backup.
+
+2007-02-12  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.3.7 released. Changes since last release
+
+        * Fixed broken client-to-server synchronize direction
+          introduced with 2.3.6 release.
+
+        * Avoid saving empty index chunk to media device if the
+          save job is prematurely cancelled or otherwise broken.
+
+2007-02-06  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.3.6 released. Changes since last release
+
+        * Added selectable type of full backup for the monthly
+          schedule. It now allows selection of the synthetic
+          type as well.
+
+        * Fixed download of support data from Windows servers.
+
+        * Fixed link to server logs for the access from the GUI
+          on Windows platform.
+
+        * Added configurable timeout for remote-tree mounter.
+
+        * Persist loading application resources from zip archives
+          if failed to serve them from the pre-built cache.
+
+        * Helios driver allows reuse of file/folder ID during the
+          sync or restore if the target volume is set to read-only.
+
+        * In CLI, allow setting of volume label/location/state/mode
+          parameters, in addition to getting the value.
+
+        * Added condition log that tracks all state changes for the
+          lifetime of a volume introduced by the application code.
+
+        * Added GUI warning when about to delete a volume.
+
+        * Added automatic (implicit) clone-volume re-synchronization.
+
+2006-12-21  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.3.5 released. Changes since last release
+
+        * Added utility to test and rectify potential wrong
+          setup of jukeboxes containing 2+ drives. Currently
+          only comand-line (CLI) access is opened.
+
+        * Fixed indexer bug that sometimes caused overlay of
+          directories and shadowing (make invisible) of regular
+          file entries after incremental backups were performed.
+
+        * Synthetic backup does not conclude written volumes
+          if the same pool is used for full, increment and
+          synthetic. We now split volumes needed for reading
+          from those required for writing at pool mount time.
+
+2006-12-12  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.3.4 released. Changes since last release
+
+        * Added environment variables passed to pre/post script.
+
+        * Corrected recycling of imported volumes, which could
+          not be relabled without deleting them from the volume
+          list first.
+
+        * Removed setting of clone volume callbacks when starting
+          a job, which caused the chunk block to be empty and
+          consequently making the cloned volumes not importable.
+
+        * Changed the type of strictStreams property from boolean
+          to integer. No consequence and not visible to the user.
+          Needed so as to limit the number of clients per stream.
+
+        * Added limiting the number of clients per stream. This is
+          still not opened thru the GUI.
+
+        * Fixed handling of IO-Registry path on Macintosh devices
+          as saved in the configuration database if the path
+          contained blanks.
+
+        * Changed SCSI message handling on Mac OSX Intel platform
+          Under some circumstances we could trigger a bug in the
+          SCSI Task kernel driver and cause the machine to panic.
+
+        * Avoid writing index on tape devices which were being
+          SCSI-bus resetted in the middle of write operation.
+
+        * Fixed loading of some AIT drives by waiting for extra
+          long time for media to be fully loaded.
+
+        * Improved volume resevation for synthetic backup, removed
+          conflicts between volumes to read and to write.
+
+        * Fixed broken submit/start of backup plan over the CLI.
+
+        * Forbid creating resources with special reserved names.
+
+        * Forbid creating reserved user preference records at login
+
+        * Added Adobe Photoshop files to list of supported image formats
+          for Quicktime image conversions.
+
+        * Fixed autoinventory when jukebox is being used by some other job.
+
+        * Improved job monitor messages when volumes or their clones are
+          requested.
+
+        * Fixed creation of the first file in a directory on windows when
+          it's parent directory path is missing and needs to be created.
+
+        * Fixed restoring from a mixed set of volumes and their clones.
+
+        * Improved autoinventory to check only the devices assigned to
+          the given pool.
+
+        * Added additional cleanup and parking the medium in case the follower
+          failed to load.
+
+        * Added setting the medium to suspect in case we expected to find a
+          label, but found the medium to be empty instead.
+
+        * Changed to always use the available primary media, before using
+          the clones.
+
+        * Corrected reporting of volumes used for restore when the job monitor
+          is not opened.
+
+2006-11-06  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.3.3 released. Changes since last release
+
+        * Fixed jukebox and drive installation wizard on Darwin.
+
+        * Corrected reporting of used volumes in job log.
+
+        * Fixed deadlock when two or more jobs are terminating
+          at the same (or roughly the same time).
+
+        * Include volume and its clone in the list of volumes
+          when per-volume browsing of the archive database.
+
+        * Fixed populating of restore basket from backup index.
+
+        * Fixed cloned volume reservation when volumes are in
+          seperate jukeboxes.
+
+2006-10-25  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.3.2 released. Changes since last release
+
+        * Removed spurious mail about device not available
+          when changing media during a save job on Sun.
+
+        * Removed breaking a job when the hard read/write
+          flag was raised but otherwise no error occured.
+
+        * Fixed GUI browsing of the backup index which failed
+          to properly address elements in the index, resulting
+          in empty root-level directory contents.
+
+        * Fixed automatic recognition of special directories
+          (fileserver volumes) when the above (parent) directory
+          is used as the source (and/or target) in a sync plan.
+
+2006-10-10  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.3.1 released. Changes since last release
+
+        * Changed parsing of script and arguments as entered
+          in pre/postscript fields in sync, archive and backup
+          plans. The new parsing scheme requires tokens to be
+          divided by spaces and if the tokens themselves contain
+          spaces, they have to be enclosed in curly braces.
+
+        * Made fixed archive directories sticky so they don't
+          get deleted after the archive, if the file deletion
+          was configured.
+
+        * Fixed re-schedule of Sync plan when just one runtime
+          has been entered and removed from the scheduler.
+
+        * Fixed delete pass for Sync when cycles are configured.
+          Also, the delete pass now purges the target directory
+          from versions.
+
+        * On Windows, do not abort file walk if we cannot open
+          some directory. Instead, log the event in the server
+          log and continue.
+
+        * Fixed deadlock occuring when multiple threads start to
+          log and one of the threads is in the middle of updating
+          the configuration database.
+
+        * Changed semantics of hard read/write tape errors. In case
+          one of those is encountered, the volume is set to suspect
+          state, email to administrator is generated but the operation
+          underway is not aborted. The reason for this is that some
+          broken tape-firmware erroneusly report hard errors after some
+          absolutely legal operations.
+
+2006-09-26  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.3.0 released. Changes since last release
+
+        * Added support for driving SCSI devices like tape drives
+          and jukeboxes on the Windows platform.
+
+        * Added QuickTime still-image, film and audio previews for
+          the archive module. This is currently only supported
+          on the Macintosh platform.
+
+        * Added support for Netatalk, an open-source file and print
+          server for Macintosh computers running on Unix servers.
+          This is currently only supported on Linux platform.
+
+        * Replaced socket command daemon (scd) with the new
+          proxy slave(s) processes operating over pipes. This
+          applies to Unix-like operating systems only.
+
+        * Added new extended job log containing all relevant log
+          messages from the server log file pertaining to that
+          specific job only. The generation of the extended log
+          is controlled with "jobProtocol" global configuration
+          option of the job scheduler module. The default value
+          is "true" which turns-on the extended log generation.
+          To change the value, for example to disable the extended
+          job logging, add following two lines to the configuration
+          file conf/lexxsrv.<port>:
+
+              ns_section ns/server/$server/module/jobsched
+              ns_param jobProtocol false
+
+        * Added "maxConcurrentJobs" global configuration option for
+          the job scheduler. The default is set to 16. To change
+          the value, for example to 32 concurrent jobs. add following
+          two lines to the configuration file conf/lexxsrv.<port>:
+
+              ns_section ns/server/$server/module/jobsched
+              ns_param maxConcurrentJobs 32
+
+        * Added "testInodeChangeTime" global configuration option
+          for the indexer so we can ignore or honour file ctime
+          modifications when selecting files for processing.
+          The default value for the option is "true" which includes
+          inode change-time checking. To ignore ctime checking, add
+          following lines to the configuration file conf/lexxsrv.<port>:
+
+              ns_section ns/server/$server/module/bixindex
+              ns_param testInodeChangeTime false
+
+        * Added per-plan email addresses. If configured, job reports
+          are sent to the given email addres(es) instead to the job
+          owner (i.e. the user who started the job).
+
+        * Manual start of backup plan does not automatically trigger
+          execution of follower plans. Only the selected plan is
+          executed with the selected level.
+
+        * Added per-user preference to stay logged-in in the Web-GUI
+          even when the browser has been terminated without explicitly
+          logging out.
+
+        * Changed click behaviour in browser to allow double-clicks
+          and right-button-select on list elements.
+
+        * Fixed incorect handling of bucket pool caused by the
+          new signalization capabilities between the peers
+          during the data trasnfer. This could eventually drain
+          the entire bucket pool and bring the data-transfer to halt.
+
+        * Fixed compression handling for Sony AIT4 tape devices
+          with the revision 1.0.3 or earlier. The tape device
+          just went astray when we attempted to force-set the
+          compression flag. Customers are encouraged to update
+          to the latest firmware release (1.0.4 as of 29.08.06)
+
+        * Changed new media handling during label as some broken
+          tape-device firmwares caused tape-device to hang when
+          issued SCSI "Locate" command when loaded a virgin media.
+
+2006-07-10  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.2.4 released. Changes since last release
+
+        * Adjusted AppleDouble parser to cope with zero-length
+          entries as created in meta-files on Apple's Xsan.
+
+        * Fixed bug in parsing synthetic plan value which was
+          introduced by fixes in 2.2.3 release and rendered
+          synthetic plan usage impossible.
+
+        * Fixed protection checking on non-root restores where we
+          wrongly checked the parent's parent directory instead of
+          just parent directory of the file being restored.
+
+        * Fixed display of values for newly configured archive plan
+          where default values have been reported, instead of the
+          newly entered ones.
+
+        * Increased default timeout value for caches from 3 to 60 secs.
+
+        * Fixed GUI bug which prevented volume import from a standalone
+          device.
+
+        * All resource deletions from GUI are now logged into log file.
+
+        * Automatically create .HSancillary files on Xinet volumes
+          because Xinet's own library does not do that which results
+          in potential loss of Apple's FinderInfo structure.
+
+        * Allow for passing additional arguments to pre/post scripts.
+
+        * Fixed case where syncplan was using the delete flag wrongly.
+
+        * Improved backup index browsing to properly select the right
+          index chunk when more than one plan is saving the same tree.
+
+        * Added option of overriding built-in email delivery by means
+          of a user-supplied script. For more information please refer
+          to: http://www.archiware.com/wiki/wiki/96
+
+2006-06-20  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.2.3 released. Changes since last release
+
+        * Fixed root of the archive job when more than one
+          entry is selected for archival.
+
+        * Fixed protection issue when non-root users were
+          restoring files directly on top of the root filesystem.
+
+        * Fixed synchronize of files larger than 4GB.
+
+        * Re-arranged layout of AppleDouble files generated
+          on non-HFS filesystems in order to overcome finder
+          crashes introduced by over-optimistic Apple's
+          optimizations which broke the AppleDouble standard.
+          Also, skips generating the AppleDouble meta-file if
+          the file contains no metadata nor resource-fork.
+
+        * Fixed rare cache-flush errors on configuration database.
+
+        * Automatically stop scheduled jobs for all backup tasks
+          belonging to a certain backup pan when the backup plan
+          gets deleted.
+
+2006-06-06  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.2.2 released. Changes since last release
+
+        * Fixed drive reservation when large number of jobs are
+          using same pool resources.
+
+        * Fixed cross-platform Sync (Helios/Solaris -> MacOSX/HFS+)
+          where synced files got wrong modification date.
+
+        * Temporarily removed ACL/metadata handling for cross-filesystem
+          (HFS<->Xsan, HFS<->UFS) operations because files containing
+          those parts caused Finder to crash and restart. The bug in
+          Finder has been reported to Apple for further examination.
+
+2006-05-22  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.2.1 released. Changes since last release
+
+        * Fixed incremental backup for windows clients.
+
+        * Fixed broken layout of apple-double files on non-hfs
+          filesystems which contained metadata values.
+
+        * Speedup of sync jobs between Mac OSX computers which
+          operated on large number of directories.
+
+        * Fixed searches in backup indexes which had to traverse
+          more than one index cycle.
+
+        * Fixed occasional "peer closed connection" errors from clients.
+
+        * Changed handling of timestamps of Xinet resource forks.
+          They are now set to the modification time of the data
+          fork explicitly.
+
+        * Fixed broken automatic jukebox inventory.
+
+2006-05-01  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.2.0 released. Changes since last release
+
+        * Added support for MacOSX Intel platform.
+
+        * Added more options to user preferences to control mail delivery.
+
+        * Job monitor shows up to 10 last jobs in list of jobs of today.
+
+        * Fixed update of archive database(s) after volume migration.
+
+        * Socket driver now listens at IP address 0.0.0.0 which includes
+          all active interfaces and bypasses reverse DNS IP-to-hostname
+          queries, which resulted in server starting problems in some
+          wrongly configured IP environments.
+
+        * Fixed parsing of file paths in sync plans which contained blanks.
+
+        * Added note about follower volume during volume migration.
+
+        * Fixed CLI jukebox inventory command to be compatible to 1.5 version.
+
+        * Backup index view does not prune deleted directories. Only deleted
+          files are pruned from the index view when snapshot is selected.
+
+        * Backup index does not limit the view to the last incremental run,
+          rather it shows all files and folders unfiltered. One must use
+          index browse options to setup specific visit-time to get the
+          snapshot view.
+
+        * Fixed handling of Windows reserved path characters when working
+          against directories under WSM control.
+
+2006-04-13  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.1.1 released. Changes since last release
+
+        * Added workaround for bug in VS2005 causing testing of
+          files on Windows having bogus modification times to
+          crash the server.
+
+        * Fixed parsing PCShare streams.
+
+        * Fixed misleading mail subjects for backup jobs stating
+          incorrect backup levels although correct levels were
+          used for the job.
+
+        * User-selected backup level always overrides any level(s)
+          assigned by the scheduler.
+
+        * Fixed restore of files from extremely deep directory
+          structures.
+
+        * Speed-up sync checking of extremely large directories
+          having 1000's of files.
+
+2006-04-03  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.1.0 released. Changes since last release
+
+        * Added support for Solaris x86 platform.
+
+        * Added configurable timeouts for remote command sessions.
+
+        * Added new tape-media types.
+
+        * Added flag to use new media for volume migration.
+
+        * Extended command-timeout to remote clients if media
+          mounting takes extra long time due to lack of system
+          resources.
+
+        * We do not attempt to open resource forks for non-regular
+          files on HFS filesystems any more.
+
+        * Fixed cancellation of sync jobs from server to client.
+
+        * Fixed labeling of media in standalone drives.
+
+        * Fixed transfer byte-count calculations which was causing
+          syncs of large directories (large number of files) to fail.
+
+        * Fixed alternate (user-given) index root for archive jobs.
+
+        * Fixed integer overflow in summary line when reporting
+          total size of data saved accross 2 or more drives.
+
+        * Fixed rare server cores happening when clicking on a new
+          job log enty in job monitor.
+
+        * Fixed incremental backups saving the same modified files
+          for each invocation, thereby creating unnecessary index
+          entries and wasting tape storage.
+
+        * Fixed parsing of bad start times in backup and archive plans.
+
+        * Fixed handling of backup index root directories containing
+          special characters in pathname.
+
+        * Improved progress reporting during volume change on restore
+
+2006-03-01  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.0.0 released. [The Three-Days-After Release]
+
+2006-02-14  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.0.0RC1 released.
+
+2006-01-31  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.0.0b5 released.
+
+2006-01-18  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.0.0b4 released.
+
+2006-01-03  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.0.0b3 released.
+
+2005-11-07  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 2.0.0b1 released.
+
+2005-10-28  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.14 released. Changes since last release
+
+        * Fixed job executor blocking on very large number of parallel
+          executing jobs.
+
+        * Fixed searching in archive indexes when very first reported
+          hit is located on non-existent volume. In such cases we got
+          in endless loop effectively blocking the access to the
+          database being queried.
+
+        * Added protective locks arround Xinet desktop library which
+          seems to be broken in MT-respect.
+
+        * Added support for Sony PDD devices on Mac OSX and Linux.
+
+        * Added adjustable session timeout settings for CLI sessions.
+          The default is to expire the session after some inactivity
+          time is passed. The inactivity time depends per default on
+          the time of the day and varies between 2 hours and 1/2 hour.
+
+          To override default setting, change to PresStore installation
+          directory (default = /usr/local/aw), edit conf/lexxsrv.<port>
+          file, where <port> is the TCP port for the PresStore server
+          (default = 8000) and add these lines at the end of the file:
+
+            ns_section ns/server/$server/module/clisrv
+            ns_param sessionTimeout <number_of_seconds>
+
+          <number_of_seconds> is the number of seconds for the timer.
+          Possible values are:
+
+            0 - default setup
+           >0 - custom timer value
+           -1 - timer is disabled (session never expires)
+
+        * Fixed pre/post script execution on client which seemed to be
+          broken since some earlier patch-release.
+
+        * Loading media from mail-slot implicitly starts first barcode
+          then mount inventory of the newly loaded slot (optionally).
+
+        * Sync plans configured to check compatibility (default) between
+          the source and the target directory refuse to operate if during
+          the runtime the target directory is missing.
+
+        * Fixed proper volume mounting of (already) burned DVD-/+R(W)
+          media when restoring data from multiple mixed-media volumes
+          (a combination of DVD-RAM's and DVD-/+R(W) media).
+
+        * On Mac OSX, added 10 minute alarm signal in the watchdog
+          proces to periodically test the server process existence
+          and restart if the server died w/o properly signalling
+          the watchdog. This behaviour was observed since 10.4 (Tiger)
+          release and  resulted in server process not properly
+          restarting when scheduled.
+
+        * Fixed metadata handling in the file walker thread which
+          caused occasional process hangs and/or cores.
+
+        * Fixed configuration database recovery when the restored
+          database schema did not match the schema used by the
+          currently deployed software version.
+
+        * Circumvented problems at media load for some revisions of
+          IBM LTO3 tape-drives. Instead of immediately reacting on
+          insane error codes delivered by the drive, we repeat the
+          operation up to 4 times with 2 seconds delay in between
+          and hope to get the drive finally load the media.
+
+        * Mount inventory on optical jukeboxes with empty caddies
+          failed prematurely. Instead of breaking the job at the
+          first empty caddy, we count this case as valid, report
+          the event and continue with the operation.
+
+        * Added support for Linux Debian 3.0+ release.
+
+        * Fixed sorting of archive selection when feeded with paths
+          to files containing newline and/or carriage-return chars.
+
+2005-08-18  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.12 released. Changes since last release
+
+        * Uses Xinet libraries for fileserver desktop maintenance
+
+        * Fixed processing of FinderInfo streams for Xinet fileserver
+          files lacking the resource fork files.
+
+        * Fixed high-watermark of 95% when writing to optical media.
+
+        * Fixed CLI handles of files with multinational and/or
+          special characters in filenames.
+
+        * Closed memory leak when archiving huge number of files.
+
+        * Changed disk-device compression flag to be bound on device
+          name instead of the device directory.
+
+        * Non-interactive CLI sessions are now set to never expire.
+
+        * Rewritten disk arbitration interface on Darwin. It now
+          allows for restarting when the diskarbitrationd daemon
+          crashes or hangs. Also, devices controlled by us never
+          publish loaded media to other users of diskarbitrationd
+          hence preventing them to interact with "our" disks.
+
+        * Added force-killing of runaway processes in scd daemon.
+
+        * Fixed deadlock situation happening when a job using the
+          media management resources is terminating and user deletes
+          the volume from the GUI.
+
+        * Circumvented misleading error messages on media detach
+          happening with some DVD-RAM drives in JVC 8000 jukeboxes.
+
+        * Skip checking writability of per-client configured restore
+          paths. We just run the restore and terminate the job with
+          error if the restore path is unwritable by user.
+
+        * Fixed importing of volumes containing continuation records.
+
+2005-06-29  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.11 released. Changes since last release
+
+        * Fixed auto-starting issues on Mac OS X 1.4 OS-restart.
+
+        * Recompiled Windows distribution to be more compatible
+          with some older Windows versions.
+
+        * Lowered high-watermark to 95% of the total available
+          size of the media when writing to optical disks.
+
+        * Added workarounds when mounting optical volumes on
+          Mac OS X when the mount-point is already present as
+          an orphan directory under the "/Volumes" root.
+
+        * Under some rare circumstances, the job monitor did not
+          show the request for mounting the continuation volume for
+          multi-volume restore. This has been fixed.
+
+        * Added directory mtime re-setting for Sync/Restore jobs.
+
+        * Fixed burning of master images to optical discs for some
+          firmware revisions and/or drive-types of DVD burners
+          found in certain types of Plasmon changer units.
+
+        * Fixed rare permission problems when uploading files as
+          non-privileged user.
+
+        * Upload file size is now limited to 256MB.
+
+        * Added provisions to log incoming CLI commands and outgoing
+          command results to aid debugging.
+
+        * Transforms the host-id to lowercase in order to avoid
+          generating licenses with bogus checksums when the supplied
+          hostid does not case-match the auto-generated one.
+
+        * Added graceful waits up to max of 1 minute between changing
+          optical volumes during restore in order to overcome some
+          strange and brief diskarbitrationd re-mounts on Darwin.
+
+        * Suppresed debug warnings when re-mounting B-side of a
+          double-sided DVD-RAM optical disc and the A-side is already
+          correctly unmounted and ejected.
+
+        * Fixed AppleSingle encoder/decoder to better handle certain error
+          cases which caused infinite loops during stream decoding.
+
+2005-05-25  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.10 released. Changes since last release
+
+        * Changed startup on Darwin 8.0 (aka Mac OSX 10.4, Tiger)
+          to not to use symbolic links to PresSTORE startup script
+          because of the tightened security issues.
+
+        * Fixed reading of soft read/write errors from some
+          tape-drives which do not correctly report SCSI log
+          sense pages P0-P3.
+
+        * Improved file deletion for archive clip generation
+          using Helios layout utility. In some cases, if the
+          clip generation failed, zero-length file corpses
+          were left in the directory, effectively disabling the
+          directory deletion on the job completion.
+
+        * Recompiled some libraries with optimization in order
+          to speed-up sequential searches on large archive indexes.
+
+2005-05-16  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.9 released. Changes since last release
+
+        * Compiled for Mac OSX 10.4 (Tiger) release.
+
+        * Fixed resource fork parsing when examining FPO images
+          on Xinet volumes.
+
+        * Provide option for disabling auto-load of Helios and
+          Xinet filesystem drivers on server startup.
+
+        * Single-drive is now allowed to write-mount any loaded
+          volume as long it is found in the volume database, belongs
+          to the required pool and is appendable.
+
+2005-05-02  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.8 released. Changes since last release
+
+        * Added more CLI commands to examine/set Archive/Backup/Sync
+          plan stati.
+
+        * Added option to CLI to restore file(s) from archive database
+          given the file physical path(s).
+
+        * Fixed finder-info stream handling on Windows for files created
+          by Xinet FullPress 11 & 14.
+
+        * Fixed excessive reference count on jukebox resources
+          which prevented the resource deletion after many
+          recycle jobs have been completed.
+
+        * Improved teardown of the per-device blockpool thread
+          to prevent leaving the device node opened in some rare
+          cases, thus avoiding "device busy" errors on subsequent
+          operations on the same device.
+
+        * Fixed volume recognition and reported sizes for Xsan
+          volumes.
+
+        * Avoid hitting the detached writer device during
+          continuation on the next optical volume during archive.
+
+        * Fixed file size summary displayed during file
+          collection phase when walking over 2048GB+ volumes.
+
+        * Corrected protection setting on Helios, Xinet resource
+          directories during restore/sync which, under circumstances,
+          did not match the protection of the parent directory.
+
+        * Skip auto-enabling the Default-Archive login-area on startup
+          since it may have been disabled by the customer.
+
+        * Allow usage of decomposed unicode on Darwin in order to
+          fully support UFS and Xsan volume types.
+
+        * Increased retry count and timeout when loading volumes
+          into slow responding drives. Instead of abandoning the
+          operation after waiting for 20 seconds for a drive to
+          load the volume, we now repeat the operation several
+          times in a row and hope that the drive will catch-in.
+
+        * Fixed syncing of plain Unix directories to Mac volumes
+          (Helios, Xinet) and reverse.
+
+        * Fixed rare deadlocks occuring when several media recycle
+          operations were simultaenously underway in different drives.
+
+        * Closed memory leak when a worker thread is being tear-down.
+
+        * Added machine-type of i686 for the Linux distribution binaries.
+
+        * License record entries are now forcefully blank-trimmed in order
+          to workaround various bad-checksum problems introduced by people
+          cut/pasting values and adding leading and/or trailing blanks.
+
+        * Helios fileserver plugin now generates even more events for
+          better integration in some workflow environments.
+
+2005-03-29  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.7 released. Changes since last release
+
+        * Reduced count of retries when sending INQUIRY SCSI
+          command to lazy and unresponsive tape drives (AIT-4).
+
+        * Added workaround for multi-threading issues in
+          conjuction with Solaris 2.9 and MP-machines.
+          Due to some unknown reasons, deletion of files
+          from the MT-process failed without any visible
+          reason and failed to properly report the fact to
+          the caller. This resulted in index failures during
+          full backups.
+
+        * Improved error message emited in transient situations
+          when a backup plan tries to acquire a device which is
+          currently handling the media-error event.
+
+        * Added simple command-line tape-media checker which
+          scans the tape-media and checks for soft and/or framing
+          non-fatal read errors.
+
+        * Improved deletion of files during full sync on Windows
+
+        * Fixed restore on Windows when the relocation path did
+          not exist and had be automatically created.
+
+        * Added CLI provisions for making jukebox inventories both
+          barcode and mount with optional slot ranges.
+
+        * Added CLI provisions for manipulating status and stopping
+          and starting of synchronize and backup plans.
+
+2005-03-21  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.6 released. Changes since last release
+
+        * Improved jukebox configuration shows all available
+          and not yet configured drives.
+
+        * Fixed automount of single drives which did not work
+          under all circumstances.
+
+        * Added workaround for some broken LTO1 tape-drives
+          from Seagate which failed to report correct block
+          position after writing a filemark.
+
+        * Set volume on "Suspect" when attempting to mount
+          and seek to EOD and the operation fails.
+
+        * Added automatic configuration of Solaris "sgen"
+          driver when running on Solaris 2.8+. This driver
+          is now used to communicate with jukebox devices.
+          For older Solaris version, "awjb" driver is used.
+
+        * Corrected problem with some jukeboxes which reported
+          invalid (non-existent) slot addresses.
+
+        * Helios fileserver plugin now generates more events
+          for better integration in some workflow environments.
+
+        * Corrected building of distribution files for client
+          update. Some tar implementation (Darwin) were throwing
+          error while tar-ing files are being changed (log-files).
+
+2005-03-07  Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.5 released. Changes since last release
+
+        * Fixed bug when sorting on dates in search window.
+
+        * Emit warning log entries if we were unable to
+          create previews using Helios Image server.
+
+        * Initially sort search results on descending
+          archive/backup date.
+
+        * Fixed rare license-counting issues on remote
+          clients when syncing several directoriees from
+          the same server at the same time.
+
+        * Work-around some broken revisions of Sony AIT-4
+          tape drives which failed to return proper data
+          on SCSI Inquiry. We are now persistent and repeat
+          inquiry request several times before abandoning.
+
+        * We will now forcefully restart the server if the
+          graceful restart attempt failed.
+
+        * Improved error message when attempting to recover
+          configuration database from empty (labeled) tape.
+
+        * Added support for japanese "shiftjis" encoding on
+          Xinet volumes. This is a global server-wide setup.
+          Please look at http://www.archiware.com/wiki/wiki/89
+          to see how to enable alternate encodings for Xinet
+          volumes.
+
+        * Jukebox driver now reports stati of elements in
+          exception instead od skipping them altogether.
+
+        * Automatic jukebox configuration now ignores element
+          exceptions (but logs them) while configuring drives.
+
+        * Fixed broken notification message in server log
+          after applying the cleaning cartridge on a drive
+          which complains about need cleaning.
+
+        * Resolved some issues with treating of paths
+          containing multinational characters passed
+          over the CLI interface.
+
+        * Added new commands for alternative indexing of
+          files archived over CLI interface.
+
+        * Fixed mail delivery to root user from system
+          generated jobs.
+
+        * Fixed locking issues when multiple jobs get
+          started and terminated by the job scheduler.
+
+        * Fixed locking issues when multiple jobs attach
+          to mounted tape pools during writing.
+
+        * Disk-based tape emulator was generating incorrect
+          links for emulated filemarks thus rendering such
+          file-based volumes un-importable. This is now
+          corrected.
+
+        * Directories containing hidden (Finder-invisible)
+          files were wrongly deleted after the archive if
+          instructed so by the archive plan. Now we will
+          skip deleting directories if they contain anything
+          else then (hidden) fileserver-specific files.
+
+        * Fixed volume label when labeling media cross-pools
+
+        * Added wait/retry into load/rewind sequence for some
+          weird HP Ultrium-2 drives which failed to rewind
+          after media load
+
+        * Forces default mediaType of TAPE for all unconfigured
+          drives and jukebox devices.
+
+2005-01-26 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.4 released. Changes since last release
+
+        * Fixed indexing of paths passed over the CLI and
+          containing special escape characters
+
+        * Fixed server logfile rolling on startup which
+          caused server-start to fail under circumstances
+
+2005-01-24 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.3 released. Changes since last release
+
+        * Fixed version checking for reverse server-client
+          connections during client->server syncs
+
+        * Fixed broken license check when installing
+          lower-numbered licenses on higher-numbered distro
+
+        * Improved recognition of SCSI target/lun for devices
+          attached on some ATTO controllers and running
+          under MacOS X 10.2.x
+
+        * Fixed jukebox configuration when some of the
+          devices in the jukebox could not be recognized
+          and had to be skipped from the configuration
+
+        * Fixed behaviour when loading media into some
+          very slow drives which report insane ASC/ASCQ
+          codes (some versions of the Matsushita DVD-RAM's
+          delivered in Plasmon D-series jukeboxes)
+
+        * Extended retries for slow-loading SDLT tapes
+
+        * Fixed race condition happening on indexer thread
+          when many parallel archive jobs compete for the
+          same index database.
+
+        * Fixed rare server segmentations caused by invalid
+          references to standard output channel during zip
+          file generations
+
+        * Fixed proper index prefix for archive jobs running
+          with master and copy pools set
+
+        * Fixed empty directory deletion for archive jobs
+          on Xinet and Mac OS X volumes
+
+        * Fixed dead-loop of disk-based tape emulator when
+          writing to a volume located on the root device
+          and root device overflows
+
+2005-01-05 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.2 released. Changes since last release
+
+        * Fixed problems with updating remote clients from
+          Mac OS X servers.
+
+        * Sun Solaris distribution contained older 1.5.0 release
+          of some components causing sync plans from Sun clients
+          to Mac/Linux servers to fail (i.e. transfer no data).
+
+2004-12-30 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.1 released. Changes since last release
+
+        * Fixed stopping of sync plans with associated Helios event
+          listeners.
+
+        * Fixed wrong usage of clock drift between machines which
+          caused sync to wrongly copy and discard files on target.
+
+2004-12-20 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.0 released. Changes since last release
+
+        * Increased bucketpool size to 256 blocks for all writers
+
+        * Fixed index problems introduced by changing directory
+          structures while the backup job is running.
+
+        * Added Windows binaries into the standard distribution
+          to be able to update Windows clients from the server.
+
+        * Server restart times are now configurable externally.
+          Please look at http://www.archiware.com/wiki/wiki/82
+          to see how to configure alternate server restart times.
+
+        * Fixed indexer problem which may generate invalid
+          internal caches for very deep directory structures.
+
+
+2004-12-06 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.0b7 released. Changes since last release
+
+        * Added bandwidth throttle for client communication.
+          It is now possible to limit the bandwidth usage
+          consumed by PresStore while sending and/or receiving
+          data to/from the networked client.
+
+        * Added customized CLI extension capabilities and
+          seeded with sources of useful utilities for batch
+          processing of volumes and utilities for backup
+          index check and repair. Look into the "modules/tcl/cli"
+          directory for additional information about new commands.
+
+        * Fixed cancellation issues during restore collection
+
+
+2004-12-01 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.0b6 released. Changes since last release
+
+        * Fixed display of archive clips with special characters
+          and/or umlauts in filename.
+
+        * CLI server listens on all interfaces, including loopback
+
+
+2004-11-27 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.0b5 released. Changes since last release
+
+        * Fixed CLI issues with national charsets on MacOS X
+
+        * Improved handling (start/stop) of scd process
+
+        * Improved error logging when unable to delete pool
+          resources. We now try to be more informative and
+          give approximate reason why the deletion failed.
+
+        * Fixed wrong display of sizes in indexes for files
+          larger than 2GB.
+
+        * Improved script for distribution-file generation
+          to exclude some unnecessary files. Also, we now
+          conditionaly generate non-compressed tar files if
+          the remote client lacks decompressing utilities.
+
+        * Fixed connectivity problems to older pre-1.5 clients
+          We incorrectly generated http authorization headers
+          resulting in invalid username/password checking.
+
+
+2004-11-05 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.0b4 released. Changes since last release
+
+        * Circumvented broken behaviour of Tandberg VS640
+          autoloader unit which incorrectly returned junk data
+          when examining picker element status.
+
+        * Added automatic restart of the socket command daemon
+          (scd) in case it blocks. This has been observed on
+          Darwin platforms.  Also, start-server script now
+          forcefully stops all lingering scd daemons before
+          starting the application server.
+
+        * Fixed blockpool thread termination and restart which
+          caused the process to block when tearing down last
+          opened storage device. This has been observed on
+          Darwin in conjuction with chained backup plans and
+          very slow clients.
+
+        * Added additional level for SCSI logging so we can trace
+          only errors and warnings without logging each separate
+          SCSI command, thus avoiding logfile saturation.
+
+        * Added additional logging when waiting for data to come
+          from the remote client during backup/archive operations.
+
+        * Fixed some rare side-effects within the file-finder
+          thread when we were unable to stat() the directory due
+          to some filesystem problems.
+
+        * Improved handling of EOM events from tape devices which
+          do not or incorrectly follow SCSI recommendations.
+
+        * Keep backup of the configuration database instance so we
+          can automatically switch to the last known state in case
+          of database error.
+
+        * Skip files during restore when max interleaving distance
+          is exceeded.
+
+        * Support resolving links to roots of Helios volumes
+
+        * Fixed duplicate file/folder ID's for restores within
+          Helios EtherShare volumes restored with "_R" option.
+
+        * Do not filter folders/containers located on unknown
+          volumes during browsing of backup and archive indexes.
+
+        * Added DVD-RAM support for Darwin. On DVD-RAM we create
+          either HFS+ or hybrid ISO/HFS/Joliet formats, depending
+          on the mastering-mode setup of the media pool.
+
+        * Revamped Darwin optical device handling and introduced
+          internal interface to the disk arbitration framework.
+
+        * Fixed differences for ATTO and Adaptec SCSI-device drivers
+          and their IO registry signatures.
+
+        * Disabled support for standalone optical devices. Until some
+          later release, we will support only devices in jukeboxes.
+
+        * Browser now opens all loginareas per default.
+
+        * Added automatic index conversion when updating from older
+          schema versions.
+
+        * Added automatic license expiry for pre-1.5 licenses. There
+          is a grace interval of 30 days allowing users to update to
+          the latest license keys. After this time, all licenses are
+          expired and must be entered again. This affects only
+          permanent licenses. Demo licenses are not affected.
+
+
+2004-10-17 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.0b3 released. Changes since last release
+
+        * Fixed handling of blank DVD+RW media. We now recognize
+          blank discs and automatically format them in a quick mode
+
+        * During installation on Linux, we now add startup scripts
+          to the level 3 in addition to level 5 starup.
+
+        * Fixed problem with optical device driver on Mac OS X
+          which failed to open the device in shared mode.
+
+
+2004-10-13 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.0b2 released. Changes since last release
+
+        * Added preliminary Sony PDD support (Linux only).
+
+        * Fixed corruption of customerconfig databases happening
+          during some OS crashes.
+
+        * Significant improvement in diskdevice performance
+
+        * Labeling diskdevice files is now much faster since it
+          does not reserve place on the filesystem for each file.
+
+        * Diskdevice naming scheme allows for controlling of the
+          compression and debug flags. Example:
+
+            /diskdevice/disk1   - no compression, no debugging
+            /diskdevice/disk1c  - set compression, no debugging
+            /diskdevice/disk1g  - set debugging, no compression
+            /diskdevice/disk1cg - set compression and debugging
+
+        * Optical disk volumes with valid cache-files can now be
+          deleted if their state is set to "Suspect" manually.
+
+        * Job-log entires are now marked red if the job has
+          been cancelled or completed with any other code than OK.
+
+
+2004-10-04 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.0b1 released. Changes since last release
+
+        * Various GUI improvements for backup index browsing
+
+        * Expanded filters to include file modification date and size
+
+        * Synchronize now checks remote modification times
+
+        * Client job-logs are now properly reflected on the server
+
+        * Improved backup index consistency checking and repair
+
+        * Changes of Helios rsrc fork files does not automatically
+          trigger processing of the data forks as well.
+
+        * Added configuration options for various timeouts for
+          client communication:
+
+            writeTout - # of seconds for writing (default = 180)
+            readTout  - # of seconds for reading (default = 7200)
+
+          To override default setting, change to PresStore
+          installation directory (default = /usr/local/aw),
+          edit conf/lexxsrv.<port> file, where <port> is the
+          TCP port for the PresStore server (default = 8000)
+          and add these three lines at the end of the file:
+
+            ns_section ns/server/$server/module/jobex/<client>
+            ns_param writeTout <seconds>
+            ns_param readTout  <seconds>
+
+          <client> is the DNS name of the PresStore client
+          <seconds> is the number of seconds for the timeout.
+
+        * Added configuration options for rewriting user and group
+          information for syncing across machines in different
+          administrative domains:
+
+            userMap  - alternate list of source and target user id's
+            groupMap - alternate list of source and target group id's
+
+          Using those options, PresStore sync will automatically rewrite
+          user and group id's to match the above tables if the source
+          user and/or group name could not be found on the target.
+
+          To override default setting, change to PresStore
+          installation directory (default = /usr/local/aw),
+          edit conf/lexxsrv.<port> file, where <port> is the
+          TCP port for the PresStore server (default = 8000)
+          and add these three lines at the end of the file:
+
+            ns_section ns/server/$server/module/jobex/<client>
+            ns_param userMap <map_of_ids>
+            ns_param groupMap <map_of_ids>
+
+          <client> is the DNS name or the PresStore client
+          <map_of_ids> is the list composed of source and target
+          ids to me mapped, like for example:
+
+            na_param userMap "100 1001 101 1002 103 1003"
+
+          In this example, the user id 100 on the source will be
+          mapped to the userid 1001 on the target, user id 101
+          will be mapped to 1002 and so on.
+
+        * Added shortcut to download of various PresStore files
+          for debugging purposes
+
+
+2004-09-15 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.0a6 released. Changes since last release
+
+        * Support for pool-bound device-stream parallelism
+
+        * Improved optical volume burn strategy at volume-swap
+
+        * Correctly skip and report files larger than optical disk
+
+        * Added GUI support for jukebox mail slot operation
+
+        * Fixed occasional RSA-key verification problems at login
+
+        * Support for several clip resolutions for archive runs
+
+
+2004-08-24 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.0a5 released. Changes since last release
+
+        * Added metadata support for archive run and search
+
+        * Added support for DVD-RAM on Linux
+
+        * Updated CLI support to support per-file metadata
+
+        * Merged all bugfixes from 1.4.3 branch release
+
+
+2004-07-05 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.0a4 released. Changes since last release
+
+        * Major cleanup of optical disk support code
+
+        * Expanded CLI to allow interrogating of Sync plans
+
+        * Merged all bugfixes from 1.4.3 branch release
+
+
+2004-06-20 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.0a3 released. Changes since last release
+
+        * Fixed handling of some Unicode sequences which caused
+          sync plans to wrongly delete and sync files/directories
+          having those sequences in their path names.
+
+        * Added server-wide configuration for default mailserver
+          and mailsender for the PresStore mail utility.
+
+          To override default setting, change to PresStore
+          installation directory (default = /usr/local/aw),
+          edit conf/lexxsrv.<port> file, where <port> is the
+          TCP port for the PresStore server (default = 8000)
+          and add these three lines at the end of the file:
+
+            ns_section ns/server/$server/module/utility/mail
+            ns_param mailServer <hostname_or_ip_address>
+            ns_param mailSender <sender_email_adderss>
+
+          <hostname_or_ip_address> is the DNS name or the TCP
+          address of the mail server (or mail transfer agent).
+          Default is: localhost
+
+          <sender_email_address> is the email address of the sender.
+          Default is: root@localhost
+
+        * Fixed intermittent problems with FibreChannel devices
+          on Mac OS X reporting spurious POWER-ON conditions.
+
+
+2004-06-08 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.5.0a2 released. Changes since last release
+
+        * Rewritten GUI for multi-language support
+
+        * Added support for optical media for archive
+
+        * Added support for tape emulator on disk-file
+
+        * Added automatic client software update option
+
+        * Added custom-defined metadata support for archive indexes
+
+        * Added encryption of usernames/passwords for network transfers
+
+        * Added user-id/group-id mapping tables for backup/restore
+
+        * Improved device-scan for Linux
+
+        * Extended CLI to allow partial creation/modification of resources
+
+
+2004-07-21 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.4.5 released. Changes since last release
+
+        * Relaxed locking on SCSI devices on Darwin. Instead of globally
+          locking the SCSI transport layer, we now selectively lock on
+          the device instance, thus improving the overall throughput.
+
+        * Relaxed limit of 50 hits per search session. Now we allow up
+          to 1000 hits per search.
+
+        * Added selection of media pools for searches in backup/archive
+          indexes.
+
+        * Fixed broken "Cancel" button during client backup index checks.
+
+
+2004-07-14 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.4.4 released. Changes since last release
+
+        * Fixed race conditions for SCSI devices on Darwin which caused
+          backup and/or archive jobs scheduled to run on the same pool
+          and device to break.
+
+        * Improved checking of the customer database on server start.
+          We now try to repair eventually broken database, instead of
+          trashing it immediately and creating the new one.
+
+        * Improved handling for Helios desktop. In some rare cases we
+          were unable to set the ID of the item after sync/restore so
+          we left the old item ID in place. This resulted in duplicate
+          item IDs. Now, we clear the item ID (set to zero) if unable
+          to assign new one. Also, we never reuse ID's when syncing or
+          restoring files. We do always generate new ID's since this
+          proved much more stable, given the actual support for reusing
+          file/folder ID's in Helios desktop library.
+
+        * Fixed backup plan scheduling problem. Monthly schedule didn't
+          execute if for the corresponding day in the weekly schedule
+          "skip" was chosen.
+
+        * Work-around for indexing library which, in rare circumstances,
+          generated bad or not-mountable index files.
+
+        * Fixed strange OS-issues on Sun resulting in periodical hanging
+          of sync-plans.
+
+        * Fixed handling of some Unicode sequences which caused sync
+          plans to wrongly delete and re-sync files/directories having
+          those sequences in their path names.
+
+        * Fixed intermittent problems with FibreChannel devices on
+          Mac OS X reporting spurious POWER-ON conditions.
+
+        * Added server-wide configuration for default mailserver and
+          mailsender for the PresStore mail utility.
+
+          To override default setting, change to PresStore installation
+          directory (default=/usr/local/aw), edit conf/lexxsrv.<port>
+          file, where <port> is the TCP port for the PresStore server
+          (default=8000) and add these lines at the end of the file:
+
+            ns_section  ns/server/$server/module/utility/mail
+            ns_param mailServer  <hostname_or_ip_address>
+            ns_param mailSender  <sender_email_adderss>
+
+          where:
+
+          <hostname_or_ip_address> is the DNS name or the TCP address
+          of the mail server (or mail transfer agent).
+          Default is: localhost
+
+          <sender_email_address> is the email address of the sender.
+          Default is: root@localhost
+
+        * Added server-wide configuration for cross-checking volumes
+          within backup indexes on server startup.
+
+          To override default setting, change to PresStore installation
+          directory (default=/usr/local/aw), edit conf/lexxsrv.<port>
+          file, where <port> is the TCP port for the PresStore server
+          (default=8000) and add these lines at the end of the file:
+
+            ns_section ns/server/$server/module/bixselector
+            ns_param crossCheckVolumes true
+
+          Default setting of the parameter is "false" which means that
+          volumes are not cross-checked at the system start.
+
+
+2004-05-24 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.4.3 released. Changes since last release
+
+        * Skip non-file and non-directory entries in Helios/Xinet vols
+
+        * Fixed file deletion for archive runs in Xinet volumes
+
+        * Fixed race condition on volume mount with multiple parallel jobs
+
+        * Fixed remote agent authorization with multiple IP interfaces
+
+        * Added creation of PNGf in addition to JPEG for archive previews
+
+        * Improved start/stop scripts to automatically terminate scd daemon
+
+        * Sync plan delete run always delete all file versions
+
+        * Sync plan delete run use file-scan always
+
+        * Versions generation for sync plans is now configurable
+
+        * Fixed handling of "Icon\d" files on Macintosh volumes
+
+        * Relaxed block sequence checking during restore
+
+        * Added user-level callbacks for file touch and deletion
+
+        * Improved CLI interface with some new commands
+
+        * Added brute-force server restart option
+
+
+2004-04-23 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.4.2 released. Changes since last release
+
+        * Fixed wrong total bytes summary for large (>1TB) backup jobs
+
+        * Fixed CLI processing of paths with blanks or curly braces
+
+        * Added hooks for custom overriding of some internal file operations
+
+        * Added user-configurable scsi logging facility
+
+        * Added simple working example for acessing CLI from shell programs
+
+        * Fixed large file problem for Windows clients
+
+
+2004-04-05 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.4.1 released. Changes since last release
+
+        * Fixed restore basket fill from the search pane
+
+        * Fixed deletion of files during sync for Xinet installations
+
+        * Fixed email reports from media manager
+
+        * Fixed encoding/decoding of special chars in file paths for CLI
+
+        * Improved hostid management and checking for Darwin
+
+        * Fixed interval time parsing for sync plans
+
+
+2004-03-24 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.4.0 released. Changes since last release
+
+        * Dupport for Mozilla browser on Windows, Mac OSX and Unices
+
+        * Removed hard-check of the browser type
+
+        * Added framework for customization of the user interface
+
+        * Support for data-compression for all network operations
+
+        * Sync plans now produce file versions and complete cycles
+
+        * Mapping of user/group names/uids for network sync
+
+        * Sync plans can now run in minute-intervals
+
+        * Pre/post scripts can now be ran on server and/or client
+
+        * CLI supports backup plan scheduling and job termination
+
+        * Uses Helios desktop library for restores in Helios volumes
+
+        * Support for the administrator (non-root) user
+
+        * Archive plans can be scheduled to run at given time
+
+        * Archive plans delete archive files *and* empty directories.
+
+        * Improved parallel restore media distribution algorythm
+
+        * Fixed pre/post-script processing on windows
+
+        * Fixed handling of special characters in filenames on restore
+
+        * Fixed race condition on device with multiple backup/restore jobs
+
+
+2004-02-04 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.3.5 released. Changes since last release
+
+        * Improved preview generation with Helios "layout" utility"
+
+        * Correct setting of client-based runtime for sync plans
+
+        * Improved reaping of idle sessions on remote clients
+
+        * Added 6.5.3 version of the indexing library
+
+        * Fixed handling of quote char "'" in filenames in GUI
+
+        * Fixed Mac OS 9 finder incompatibility for synced files
+
+        * Circumvent improper host IP config in some Mac OS X setups
+
+        * New version of the tcl lib and fix for "~" in ES dir walker
+
+        * Fixed wrong timezone info in notification emails
+
+        * Fixed volume handling for parallel restore operations
+
+        * Improved handling of volume chunk directory on EOM events
+
+        * Removed block position testing during read on media devices
+
+        * Fixed race condition when mounting archive pool media
+
+        * Jobs submitted over CLI handle the pool/copypool correctly
+
+        * Fixed autostart of disabled follower-plans during backup
+
+
+2003-12-05 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.3.4 released. Changes since last release
+
+        * Fixed race condition on devices during parallel media label
+
+        * Fixed timeouts to clients during long running synchronize
+
+        * Fixed fileserver volume usage during client backup
+
+        * Improved volume handling during parallel saves to same pool
+
+        * Fixed post-archive tasks with parallel jobs using same plan
+
+
+2003-11-21 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.3.3 released. Changes since last release
+
+        * Reduced default bucketpool size to 128 blocks for all writers
+
+        * Fixed index shadow problems in archive with cloning
+
+        * Fixed handling of backslashes in file names
+
+        * Fixed compatibility with ancient Exabyte drives
+
+        * Fixed filter usage in sync plans
+
+        * Fixed syncing of very large folders with uft-8 filenames
+
+        * Separated archive from preview generation in indexer
+
+        * Updated PAM configuration for Darwin
+
+
+2003-11-10 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.3.2 released. Changes since last release
+
+        * Changed default iocount for channel writer from 4 to 1
+
+        * Increased bucketpool size to 512 blocks for all writers
+
+        * Disabled extended block-position checking during writes
+
+        * Dynamically adjust polling time during backup/sync/restore
+
+        * Fixed syncing of very large folders
+
+        * Fixed broken client->server sync direction
+
+        * Fixed restore of files from older index cycles
+
+        * Added list of supported versions for client version check
+
+
+2003-11-01 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.3.1 released. Changes since last release
+
+        * Corrected file names with blanks for synchronize
+
+        * Recycling of single drive volumes when use new volume is on
+
+        * Sychronizing from Windows to other OS
+
+        * Corrected restore of older file versions from the backup index
+
+        * Fixed issues when saving NFS-mounted files w/o proper permissions
+
+        * Send close events on restore/sync if running against Image server
+
+        * Fixed referencing to old deleted volumes during parallel restore
+
+
+2003-10-20 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.3.0 released. Changes since last release
+
+        * Add full server support for MacOSX platform
+
+        * Improved cancellation for jobs waiting for media recycle
+
+        * Improved label operation to use two-phase extended verify
+
+        * File counting before archive/backup is now user-selectable
+
+        * Added tunable media and channel blockpool implementation
+
+        * Added sync plans and related functionality
+
+        * Enabled starting of the application server as non-root user
+
+        * Rewritten and simplified most of the GUI panes
+
+        * Support for fixed and variable blocksize for media devices
+
+        * Added access to baskets directly from the search pane
+
+        * added access to job monitor and baskets from the top pane
+
+        * Rewritten filters to allow selection and inclusion of files
+
+        * Added automatic mount for single media drive installations
+
+        * Added list of fileserver volumes (as hint) for all plans
+
+        * Improved choice of restore location (adjustable per-client)
+
+        * Added thin client countable license
+
+        * Added optional gzip compression of returned browser content
+
+        * Added user-selectable root of archived files in archive database
+
+        * Added option for deleting files after successful archive run
+
+        * Added pre/post script processing for archive plans
+
+
+2003-07-16 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.2.2 released. Changes since last release
+
+        * Corrected localization issues for non-C environments
+
+        * Corrected handling of multiple jukeboxes
+
+        * Fixed socket timeout issues observed for fast clients
+
+        * Improved volume handling for offline volumes
+
+        * Fixed CLI handling of special chars in filenames
+
+
+2003-07-14 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.2.1 released. Changes since last release
+
+        * Fixed various CLI API issues
+
+        * Greatly improved Win performance over network
+
+        * Fixed restoring files directly to root, w/o relocation
+
+        * Adjusted socket buffers to match media block length
+
+        * Fixed auto-renumbering of multiply-archived items
+
+
+2003-07-07 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.2.0 released. Changes since last release
+
+        * Support for filesystem-neutral meta format
+
+        * Redesigned backup plan scheduling
+
+        * Support for MacOSX and Win2K clients
+
+
+2003-06-11 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.1.3 released. Changes since last release:
+
+        * Enabled session tickle timer for CLI connectors
+
+        * Enabled file parts processing to CLI archive selections
+
+        * Fixed index root creation for archive jobs with single file
+
+
+2003-06-02 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.1.2 released. Changes since last release:
+
+        * Indexing during increment saves rebuilds index file now
+
+        * Fixed index chunk maintenance in the configuration database
+
+
+2003-04-24 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.1.1 released. Changes since last release:
+
+        * Several CLI bugfixes
+
+        * Fixed indexer-created shadow directories for some increment saves
+
+        * Improved index consistence checking and repair
+
+        * Improved various library issues for Windows and Darwin ports
+
+        * Backup-plans support monthly full-backup schedules
+
+        * Introduced separate pools for full and incremental backups
+
+        * Added re-calculation of recyclable volumes as separate volume task
+
+        * Volume label can be changed after initial label operation
+
+        * Added extra mode (Closed) for volume
+
+        * Added new fields in the volume list in browser (usage, date filled)
+
+        * Download and restore baskets have "select-all" option
+
+        * Added short list form for large number of entries in browser win
+
+        * Fixed some protection issues during non-root restores
+
+
+2003-02-17 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.1.0 released. Changes since last release:
+
+        * Full Xinet FullPress support
+
+        * Parallel restore capability
+
+        * Improved restore in live Ethershare volumes
+
+        * Added pre/post-processing scripts for backup plans
+
+        * Automatic version filtering during restore
+
+        * Fixed per-volume counters for parallel backups
+
+        * Option for selecting new volume for full backups
+
+        * Fixed handling of medium barcode labels during inventory
+
+        * Improved logging of device cleaning warning messages
+
+        * Added cleaning flag for device resources
+
+        * Added cleaning medium slot ranges for jukeboxe resources
+
+        * Pull-down menues in GUI are now sticky
+
+        * Full index chunks are saved for each backup plan run
+
+        * Nsdchat enables remote connections over TCP sockets
+
+        * Added gallery view in the Web GUI
+
+        * Fixed volume position reporting
+
+        * Fixed handling of various resource reference counters
+
+        * Improved handling/reporting of various volume statistics
+
+
+2002-12-20 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.0.6 released. Changes since last release:
+
+        * Fixed broken mount for single drives
+
+
+2002-12-16 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.0.5 released. Changes since last release:
+
+        * fixed deadlock on volume EOM condition
+
+        * Mount/unmount of any tape thru device interface
+
+        * Inventory does not break on hardware change
+
+        * Volumes are now properly recognized even after jukebox deletion
+
+
+2002-12-11 Ibrahim Tannir <itannir@archiware.com>
+
+        Version 1.0.4 released. Changes since last release:
+
+        * Browser now uses tabular display in order to show long filenames
+
+        * Fixed protection checking for non-root restores
+
+        * Fixed resource reservation when using copypool during backup
+
+        * Fixed parallel plan run when one plan was in recycle mode
+
+        * Volume recycle policy now recycles as many volume as possible
+
+        * Fixed per-volume statistics issues for parallel plan runs
+
+        * Fixed datarace associated with different timer handlers
+
+        * Added shortcut for saving all fixed filesystems in backup plans
+
+        * Added re-integration of volumes from/to the media database
+
+        * Sort order/column in browser are now preserved within a session
+
+
+2002-11-27 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.0.3 released. Changes since last release:
+
+        * Fixed volume barcode handling for manual volume changes
+
+        * Fixed some rare deadlock issues with concurrent plans
+
+        * Added experimental (not yet opened) metadata support
+
+
+2002-11-15 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.0.2 released. Changes since last release:
+
+        * Fixed loginarea caching by introducing per-user cache
+
+        * Jukebox inquiry allowed for reserved units as well
+
+        * Fixed ctime handling during incremental save operation
+
+        * Fixed cancellation handling in polled_obtain_drives method
+
+        * Save operation quits on first unrecognized block error
+
+        * circumvented LTO read-after-filemark illegal position report
+
+        * Fixed top-level-item unicode translation for archive operation
+
+        * Added preliminary bare-bones CLI interface
+
+        * Fixed some jukebox hardware configuration issues
+
+
+2002-10-17 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.0.1 released. Changes since last release:
+
+        * Added preliminary english documentation
+
+        * Save/restore handles files larger than 2GB
+
+        * Clip sizes are now user-configurable
+
+        * Clip generation from both layout and/or original image
+
+        * Fixed reporting of recoverable read-errors during restore
+
+
+2002-10-14 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 1.0.0 released.

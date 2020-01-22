@@ -1,0 +1,8 @@
+#!/bin/sh
+
+get_port()
+{
+    PORT=$(basename "$(ls /usr/local/aw/config/lexxsrv.*)" | cut -d "." -f 2)
+    echo "$PORT"
+}
+

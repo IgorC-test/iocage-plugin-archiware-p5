@@ -1,0 +1,554 @@
+#!/bin/sh
+#
+# Startup file. You can use it interactively or within some
+# /etc/rc?-d/S* startup script.
+#
+# See the file "license.txt" for information on usage and
+# redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# ----------------------------------------------------------------------
+#
+
+NASbox=""
+case `uname -s` in
+    SunOS)
+        id=/usr/xpg4/bin/id
+        test=/usr/bin/test
+    ;;
+    Linux)
+        id=/usr/bin/id
+        test=test
+        SYNOLOGY=0
+        cf=/etc/synoinfo.conf
+        if $test -x /bin/get_key_value; then
+            if test -f $cf; then
+                case `/bin/get_key_value $cf unique` in
+                    synology*)
+                        NASbox="synology"
+                        ;;
+                esac
+            fi
+        fi
+        QNAP=0
+        cf=/etc/model.conf
+        if $test -f $cf; then
+            if test ! -z "`awk '/VENDOR[ \t]*=[ \t]*QNAP/' $cf`"; then
+                NASbox="qnap"
+            fi
+        fi
+        READYNAS=0
+        cf=/proc/readynas/model
+        if $test -f $cf; then
+            if test ! -z "`grep ReadyNAS $cf`"; then
+                NASbox="readynas"
+            fi
+        fi
+    ;;
+    FreeBSD)
+        id=/usr/bin/id
+        test=test
+        FREENAS=0
+        case "`uname -i`" in
+            FREENAS*)
+                NASbox="freenas"
+            ;;
+        esac					
+    ;;
+    Darwin)
+        id=/usr/bin/id
+        test=test
+    ;;
+esac
+
+if $test `$id -u` -ne 0; then
+    echo "Starting P5 can only be done as privileged user." >&2
+    exit 129
+fi
+
+#
+# Override locale settings
+#
+
+unset LC_CTYPE
+unset LC_TIME
+unset LC_ALL
+
+LANG="en_US.UTF-8"; export LANG
+LC_TIME="C"; export LC_TIME
+
+locale >/dev/null 2>&1
+if $test $? -eq 0; then
+    if $test -z "`locale 2>/dev/null | grep LC_CTYPE | grep 'en_US.[uU][tT][fF]-8'`"; then
+        echo "Required locale en_US.UTF-8 not installed on this system." >&2
+        exit 1
+    fi
+fi
+
+#
+# Figure out our home directory
+#
+
+dir=`dirname "$0"`
+cwd=`pwd`
+cd "$dir"
+LDIR=`pwd`; export LDIR
+cd "$cwd"
+
+#
+# Always use private TEMP directory
+# as we might need more temp space.
+#
+
+TMPDIR="$LDIR"/temp;export TMPDIR
+TCL_LIBRARY="$LDIR"/lib/tcl8.5; export TCL_LIBRARY
+
+#
+# Check if we are hitting Helios as we do
+# distribute some of their libraries. 
+#
+
+if $test -f /etc/HELIOSInstallPath; then
+    HLIB=`cat /etc/HELIOSInstallPath`/lib
+fi
+
+#
+# Do platform-specific startup setup
+#
+
+Slev=99
+Klev=01
+
+case `uname -s` in
+    Linux)
+        kill=/bin/kill
+        chmod=/bin/chmod
+        chown=/bin/chown
+        sf=/etc/init.d/lexx
+        lf="\"$LDIR/etc/rc.lexx\""
+        if $test -f $sf; then
+            if $test `awk '/rc.lexx/{print $1; exit}' $sf` != $lf; then
+                rm $sf
+            fi
+        fi
+        if $test -z "$NASbox"; then
+            if $test ! -f $sf; then
+                echo "#!/bin/sh" > $sf
+                echo "### BEGIN INIT INFO" >> $sf
+                echo "# Provides: lexx" >> $sf
+                echo "# Required-Start:" >> $sf
+                echo "# Required-Stop:" >> $sf
+                echo "# Default-Start: 2 3 4 5" >> $sf
+                echo "# Default-Stop: 0 1 6" >> $sf
+                echo "# Short-Description: P5 Server" >> $sf
+                echo "# Description: Archiware P5 Application Suite" >> $sf
+                echo "### END INIT INFO" >> $sf
+                echo "$lf \$*" >> $sf
+                $chmod 0755 $sf
+                $chown root $sf
+                if $test -x /usr/sbin/update-rc.d; then
+                    /usr/sbin/update-rc.d lexx defaults $Slev $Klev
+                elif $test -x /bin/systemctl; then
+                    ss=/lib/systemd/system/lexx.service
+                    echo "[Unit]" > $ss
+                    echo "Description=Archiware P5 Application Suite" >> $ss
+                    echo "After=network.target" >> $ss
+                    echo "[Service]" >> $ss
+                    echo "ExecStart=$sf start" >> $ss
+                    echo "ExecStop=$sf stop" >> $ss
+                    echo "Type=forking" >> $ss
+                    echo "TimeoutSec=infinity" >> $ss
+                    echo "Restart=no" >> $ss
+                    echo "User=root" >> $ss
+                    echo "Group=root" >> $ss
+                    echo "[Install]" >> $ss
+                    echo "WantedBy=multi-user.target" >> $ss
+                    $chmod 0755 $ss
+                    $chown root $ss
+                    /bin/systemctl enable lexx.service 1>/dev/null 2>&1
+                else
+                    for i in 2 3 4 5; do
+                        if $test -d /etc/rc$i.d; then
+                            rm -f /etc/rc$i.d/S*lexx
+                            ln -s $sf /etc/rc$i.d/S${Slev}lexx
+                        elif $test -d /etc/init.d/rc$i.d; then
+                            rm -f /etc/init.d/rc$i.d/S*lexx
+                            ln -s $sf /etc/init.d/rc$i.d/S${Slev}lexx
+                        fi
+                    done
+                    for i in 0 1 6 S; do
+                        if $test -d /etc/rc$i.d; then
+                            rm -f /etc/rc$i.d/K*lexx
+                            ln -s $sf /etc/rc$i.d/K${Klev}lexx
+                        elif $test -d /etc/init.d/rc$i.d; then
+                            rm -f /etc/init.d/rc$i.d/K*lexx
+                            ln -s $sf /etc/init.d/rc$i.d/K${Klev}lexx
+                        fi
+                    done
+                fi
+            fi
+        fi
+        PBIN=binaries/Linux/unknown/64
+        LBIN="$LDIR/$PBIN"
+        LTFS="$LBIN/ibmltfs":"$LBIN/othrltfs"
+        PATH="$LDIR/$PBIN":/usr/local/bin:$PATH; export PATH
+        LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"$LBIN":"$LTFS":$HLIB:/usr/local/lib
+        export LD_LIBRARY_PATH
+    ;;
+    FreeBSD)
+        kill=/bin/kill
+        chmod=/bin/chmod
+        chown=/usr/sbin/chown
+        sf=/etc/rc.d/lexx
+        lf="\"$LDIR/etc/rc.lexx\""
+        if $test -f $sf; then
+            if $test `awk '/rc.lexx/{print $1; exit}' $sf` != $lf; then
+                rm $sf
+            fi
+        fi
+        if $test ! -f $sf; then
+            echo "#!/bin/sh" > $sf
+            echo "# REQUIRE: NETWORKING FILESYSTEMS" >> $sf
+            echo ". /etc/rc.subr" >> $sf
+            echo "name=\"lexx\"" >> $sf
+            echo "rcvar=\"lexx_enable\"" >> $sf
+            echo "start_cmd=\"lexx_start\"" >> $sf
+            echo "stop_cmd=\"lexx_stop\"" >> $sf
+            echo "lexx_start()" >> $sf
+            echo "{" >> $sf
+            echo "$lf start" >> $sf
+            echo "}" >> $sf
+            echo "lexx_stop()" >> $sf
+            echo "{" >> $sf
+            echo "$lf stop" >> $sf
+            echo "}" >> $sf
+            echo "load_rc_config lexx" >> $sf
+            echo "run_rc_command \"\$1\"" >> $sf
+            if $test -z "`grep lexx_enable /etc/rc.conf`"; then
+                echo "lexx_enable=\"YES\"" >> /etc/rc.conf
+            fi
+            $chown root:wheel $sf
+            $chmod 0755 $sf
+            if $test "$NASbox" = "freenas"; then
+                rd=/conf/base/etc/rc.d
+                rf=/conf/base/etc/rc.conf
+                if $test -d $rd -a ! -f $rd/lexx; then
+                    cp $sf $rd/lexx
+                    $chown root:wheel $rd/lexx
+                    $chmod 0755 $rd/lexx
+                    if $test -z "`grep lexx_enable $rf`"; then
+                        echo "lexx_enable=\"YES\"" >> $rf 
+                    fi
+                fi
+            fi
+        fi
+        PBIN=binaries/FreeBSD/`uname -p`/`uname -r | awk -F. '{print $1}'`
+        LBIN="$LDIR/$PBIN"
+        PATH="$LDIR/$PBIN":/usr/local/bin:$PATH; export PATH
+        LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"$LBIN":/usr/local/lib
+        export LD_LIBRARY_PATH
+    ;;
+    Darwin)
+        kill=/bin/kill
+        chmod=/bin/chmod
+        chown=/usr/sbin/chown
+        PBIN=binaries/Darwin/x86_64
+        LBIN="$LDIR/$PBIN"
+        LTFS="$LBIN/ibmltfs":"$LBIN/othrltfs"
+        PATH="$LDIR/$PBIN":/usr/local/bin:$PATH; export PATH
+        DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:"$LBIN":"$LTFS":$HLIB:/usr/local/lib
+        export DYLD_LIBRARY_PATH
+    ;;
+    SunOS)
+        kill=/usr/bin/kill
+        chmod=/usr/bin/chmod
+        chown=/usr/bin/chown
+        sf=/etc/init.d/lexx
+        lf="\"$LDIR/etc/rc.lexx\""
+        if $test -f $sf; then
+            if $test `awk '/rc.lexx/{print $1; exit}' $sf` != $lf; then
+                rm $sf
+            fi
+        fi
+        if $test ! -f $sf; then
+            echo "#!/bin/sh" > $sf
+            echo "$lf \$*" >> $sf
+            $chmod 0755 $sf
+            for i in 2 3 4 5; do
+                if $test -d /etc/rc$i.d; then
+                    rm -f /etc/rc$i.d/S*lexx
+                    ln -s $sf /etc/rc$i.d/S${Slev}lexx
+                fi
+            done
+            for i in 0 1 6 S; do
+                if $test -d /etc/rc$i.d; then
+                    rm -f /etc/rc$i.d/K*lexx
+                    ln -s $sf /etc/rc$i.d/K${Klev}lexx
+                fi
+            done
+        fi
+        PBIN=binaries/SunOS/i386/64
+        LBIN="$LDIR/$PBIN"
+        PATH="$LDIR/$PBIN":/usr/local/bin:$PATH; export PATH
+        LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"$LBIN":$HLIB:/usr/local/lib
+        export LD_LIBRARY_PATH
+    ;;
+    *)
+        echo "Unsupported platform: `uname -s`"
+        exit 130
+    ;;
+esac
+
+#                                                                               
+# Assure config directory is present                                            
+#                                                                               
+                                                                                
+if $test -L "$LDIR"/config; then
+    rm -f "$LDIR"/config
+fi
+if $test ! -d "$LDIR"/config; then
+    mkdir -p "$LDIR"/config
+fi
+
+#
+# Defaults for user and server name
+#
+
+srv=lexxsrv
+usr=root
+
+#
+# Make sure those are protected, as we are
+# currently running under id of zero.
+#
+
+$chmod 400 "$LDIR"/etc/srvconf.tcl 1>/dev/null 2>&1
+$chmod -R 700 "$LDIR"/config/customerconfig 1>/dev/null 2>&1
+$chown -R $usr "$LDIR"/config 1>/dev/null 2>&1
+$chown -R $usr "$LDIR"/log 1>/dev/null 2>&1
+$chown -R $usr "$LDIR"/etc/languages 1>/dev/null 2>&1
+$chown -R $usr "$LDIR"/servers/$srv/modules/nslog 1>/dev/null 2>&1
+
+#
+# Test if user should be overriden
+#
+
+usage() {
+    if $test ! -z "$NASbox"; then
+        echo "Usage: $0 [-u username]"
+    else
+        echo "Usage: $0 [-p port] [-u username]"
+        exit 128
+    fi
+}
+
+port=0
+
+while $test ! -z "$1"; do
+    case "$1" in
+        -u)
+            shift
+            if $test -z "$1"; then
+                usage
+            fi
+            my=`$id $1 2>/dev/null`
+            if $test $? -ne 0; then
+                echo "unknown user: $1"
+                exit 133
+            fi
+            usr=$1
+            if $test `$id -u $usr 2>/dev/null` -gt 0; then
+                $chown -R $usr "$LDIR"/config 1>/dev/null 2>&1
+                $chown -R $usr "$LDIR"/log 1>/dev/null 2>&1
+                $chown -R $usr "$LDIR"/etc/languages 1>/dev/null 2>&1
+                $chown -R $usr "$LDIR"/servers/$srv/modules/nslog 1>/dev/null 2>&1
+            fi
+            ;;
+        -p) 
+            shift
+            if $test -z "$NASbox"; then
+                if $test -z "$1"; then
+                    usage
+                fi
+                port=$1
+                case $port in
+                    [0-9][0-9][0-9][0-9]|[0-9][0-9][0-9][0-9][0-9])
+                        if test $port -lt 1024 -a $port -gt 65534; then
+                            port=0
+                        fi
+                        ;;
+                    *)
+                        port=0
+                        ;;
+                esac
+                if $test $port -eq 0; then
+                    echo "invalid port: $port"
+                    exit 134
+                fi
+            fi
+            ;;
+        *)
+            echo "unrecognized option: $1"
+            usage
+            ;;
+    esac
+    shift
+done
+
+#
+# Fix link to the correct binaries.
+#
+
+if $test ! -r "$LDIR"/bin -o -L "$LDIR"/bin; then
+    cd "$LDIR"
+    rm -f bin
+    ln -s $PBIN bin
+    cd "$cwd"
+fi
+
+#
+# Test for config file and install default
+# if none found.
+# Optionally, rename it to the correct port.
+#
+
+cnf=`ls -1 "$LDIR"/config/$srv.[0-9] 2>/dev/null`
+if $test $? -ne 0 -o -z "$cnf"; then
+    if $test $port -eq 0; then
+        port=8000
+    fi
+    case $NASbox in
+        synology)
+            port=20000
+        ;;
+        readynas)
+            port=8500
+        ;;
+        qnap)
+            port=8001
+        ;;
+    esac
+    cnf="$LDIR"/config/$srv.$port
+    cp "$LDIR"/etc/srvconf.def $cnf
+else
+    pid=`cat "$LDIR"/log/$srv.pid 2>/dev/null`
+    if $test $? -eq 0; then
+        $kill -s 0 $pid 2>/dev/null
+        if $test $? -eq 0; then
+            echo "already running; pid: $pid"
+            exit 0
+        fi
+    fi
+    old=`echo $cnf | sed 's/[^.]*\.//'`
+    if $test $port -ne 0 -a $port -ne $old; then
+        mv $cnf "$LDIR"/config/$srv.$port
+        cnf="$LDIR"/config/$srv.$port
+    elif $test $port -eq 0; then
+        port=$old
+    fi
+fi
+
+#
+# Start the server now
+#
+
+if $test -z "$usr"; then
+    usr="root"
+fi
+if $test "$usr" = "root"; then
+    echo "Starting P5 application server, be patient..."
+else
+    echo "Starting P5 application server as user '$usr', be patient..."
+fi
+if $test "$usr" = "root" -a "$NASbox" = "qnap"; then
+    usr="admin"
+fi
+
+cd "$LDIR"
+rm -f log/$srv.pid
+
+case "`uname -s`" in
+    Darwin)
+        pl=/Library/LaunchDaemons/com.archiware.presstore.$srv.plist
+        ml="$LDIR"/etc/LaunchDaemon.plist
+        sed -e "s|HOME|$LDIR|g" \
+            -e "s|NSD|$LBIN/nsd|g" \
+            -e "s|UPTS|$PATH|g" \
+            -e "s|SERV|$srv|g" \
+            -e "s|USER|$usr|g" \
+            -e "s|PORT|$port|g" < $ml > $pl
+        $chmod 0644 $pl
+        launchctl load -wF $pl 2>/dev/null
+    ;;
+    *)
+        ulimit -c unlimited
+        umask 0
+        "$LDIR"/bin/nsd -w -u $usr -t $cnf 1>/tmp/$srv.$$ 2>&1
+        if $test $? -ne 0; then
+            echo "failed: `cat /tmp/$srv.$$`"
+            exit 1
+        fi
+        rm -f /tmp/$srv.$$
+    ;;
+esac
+
+#
+# Synology uses @ in folder paths thus nsdchat command can be wrongly parsed.
+# To circumvent this, pattern2: sid@home:serv is used.
+#
+
+case "$LDIR" in
+    *@*)
+        url="awfile:/s-1@$LDIR:$srv"
+    ;;
+    *)
+        url="awfile:/$LDIR:$srv"
+    ;;
+esac
+
+#
+# Wait until we get the server's CLI response
+# which implies everything is up and running.
+#
+
+try=60
+while $test $try -gt 0; do
+    pid=`cat log/$srv.pid 2>/dev/null`
+    if $test $? -ne 0; then
+        sleep 1
+        try=`expr $try - 1`
+        continue
+    fi
+    $kill -s 0 $pid 2>/dev/null
+    if $test $? -ne 0; then
+        sleep 1
+        try=`expr $try - 1`
+        continue
+    fi
+    bin/nsdchat -s "$url" -x "srvinfo address" >/tmp/$srv.addr 2>/dev/null
+    if $test $? -eq 0; then
+        bin/nsdchat -s "$url" -x "srvinfo port" > /tmp/$srv.port 2>/dev/null
+        bin/nsdchat -s "$url" -x "srvinfo lexxvers" > /tmp/$srv.vers 2>/dev/null
+        urlh="http://`cat /tmp/$srv.addr`:`cat /tmp/$srv.port`/login"
+        urls="https://`cat /tmp/$srv.addr`:`expr \`cat /tmp/$srv.port\` + 443`/login"
+        echo "pid: $pid (version \"`cat /tmp/$srv.vers`\" running)"
+        echo "url: $urlh, $urls (use web-browser to connect)"
+        rm -rf /tmp/$srv.*
+        break
+    else
+        sleep 1
+        try=`expr $try - 1`
+        continue
+    fi
+done
+
+cd "$cwd"
+
+if $test $try -eq 0; then
+    echo "Failed: timeout waiting for server to start"
+    exit 1
+fi
+
+echo "Started P5 application server \"$srv\", pid: $pid"
+
+exit 0 
+

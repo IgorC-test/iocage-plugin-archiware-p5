@@ -1,0 +1,69 @@
+#!/bin/sh
+#
+# Test server connection.
+#
+# See the file "license.txt" for information on usage and
+# redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# ----------------------------------------------------------------------
+#
+
+#
+# Get home directory
+#
+
+cwd=`pwd`
+cd `dirname $0`
+LDIR=`pwd`; export LDIR
+cd $cwd
+
+#
+# Do some platform-specific setup
+#
+
+case `uname -s` in
+    Linux|SunOS)
+        ps="ps -e"
+    ;;
+    Darwin|FreeBSD)
+        ps="ps -ax"
+    ;;
+    *)
+        echo "Unsupported platform `uname -s`" >&2
+        exit 130
+    ;;
+esac
+
+srv=lexxsrv
+pid=`cat "$LDIR"/log/$srv.pid`
+if test $? -gt 0; then
+    echo "can't connect to server: not running?"
+    exit 1
+fi
+
+new=`$ps | grep nsd | grep $pid | grep -v grep | awk '{print $1;}'`
+if test -z "$pid" -o -z "$new"; then
+    echo "can't connect to server $srv: no pid: $pid"
+    exit 1
+fi
+
+#
+# Use CLI to gather real server data
+#
+
+cd "$LDIR"
+bin/nsdchat -c "srvinfo address" >/tmp/$srv.addr
+bin/nsdchat -c "srvinfo port" >/tmp/$srv.port
+bin/nsdchat -c "srvinfo lexxvers" >/tmp/$srv.vers
+ret=$?
+cd $cwd
+
+if test $ret -eq 0; then
+    url="http://`cat /tmp/$srv.addr`:`cat /tmp/$srv.port`/login"            
+    echo "pid: $pid (version \"`cat /tmp/$srv.vers`\" running)"             
+    echo "url: $url (use web-browser to connect)"                           
+fi
+rm -rf /tmp/$srv.*
+
+exit $ret
+
