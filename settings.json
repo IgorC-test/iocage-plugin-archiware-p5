@@ -9,6 +9,6 @@
 			"range": "8000-32000",
 			"default": "8000",
 			"requirerestart": true
-		},
+		}
         }
 }
