@@ -1,14 +1,12 @@
 {
-	"servicerestart":"service lexx restart",
+	"servicerestart": "service lexx restart",
 	"serviceget": "/usr/local/aw/etc/getport",
 	"options": {
 		"port": {
 			"type": "int",
 			"name": "Archiware P5 Port",
 			"description": "Port for accessing P5",
-			"range": "8000-32000",
-			"default": "8000",
-			"requirerestart": true
+			"default": "8000"
 		}
         }
 }
