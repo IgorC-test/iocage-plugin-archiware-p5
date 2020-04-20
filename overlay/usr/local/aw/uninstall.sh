@@ -15,14 +15,16 @@
 case `uname -s` in
   SunOS)
     id=/usr/xpg4/bin/id
+    echo=/bin/echo
     ;;
   *)
     id=/usr/bin/id
+    echo=/bin/echo
     ;;
 esac
 
 if test `$id -u` -ne 0; then
-    echo "Uninstalling P5 can only be done as user root!" >&2
+    $echo "Uninstalling P5 can only be done as user root!" >&2
     exit 1
 fi
 
@@ -42,24 +44,24 @@ cd "$cwd"
 
 "$LDIR/ping-server" >/dev/null 2>&1
 if test $? -eq 0; then
-    echo ""
-    echo "NOTE: The P5 application server is still runing."
-    echo "You should stop the server with \"stop-server\""
-    echo "before uninstalling P5 files from this system."
-    echo ""
+    $echo ""
+    $echo "NOTE: The P5 application server is still runing."
+    $echo "You should stop the server with \"stop-server\""
+    $echo "before uninstalling P5 files from this system."
+    $echo ""
     exit 1
 fi
 
 ans="n"
 mrk=0
 
-echo ""
-echo "This script removes P5 traces from startup directories."
-echo -n "Do you really like to do this (y/n) [n]: "
+$echo ""
+$echo "This script removes P5 traces from startup directories."
+$echo -n "Do you really like to do this (y/n) [n]: "
 read ans
 if test "x"$ans = "xy"; then
     mrk=1
-    echo -n "Removing traces from system startup directories..."
+    $echo -n "Removing traces from system startup directories..."
     case `uname -s` in
         Darwin)
             rm -rf /Library/PreferencePanes/PresSTORE.prefPane
@@ -107,7 +109,7 @@ if test "x"$ans = "xy"; then
             rm -f /etc/init.d/lexx
         ;;
     esac
-    echo " done."
+    $echo " done."
 fi
 
 #
@@ -115,19 +117,19 @@ fi
 #
 
 if test $mrk -eq 0; then
-    echo ""
-    echo "No actions performed, exiting."
+    $echo ""
+    $echo "No actions performed, exiting."
 else
-    echo ""
-    echo "You may now want to delete the whole directory:"
-    echo ""
-    echo "    \"$LDIR\""
-    echo ""
-    echo "This removes last traces of P5 from this system."
-    echo ""
-    echo "Thank you for using/evaluating P5 product."
-    echo "The Archiware P5 Team (http://www.archiware.com)."
-    echo ""
+    $echo ""
+    $echo "You may now want to delete the whole directory:"
+    $echo ""
+    $echo "    \"$LDIR\""
+    $echo ""
+    $echo "This removes last traces of P5 from this system."
+    $echo ""
+    $echo "Thank you for using/evaluating P5 product."
+    $echo "The Archiware P5 Team (http://www.archiware.com)."
+    $echo ""
 fi
 
 exit 0

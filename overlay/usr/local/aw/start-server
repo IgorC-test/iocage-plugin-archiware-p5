@@ -52,7 +52,7 @@ case `uname -s` in
             FREENAS*)
                 NASbox="freenas"
             ;;
-        esac					
+        esac
     ;;
     Darwin)
         id=/usr/bin/id
@@ -104,7 +104,7 @@ TCL_LIBRARY="$LDIR"/lib/tcl8.5; export TCL_LIBRARY
 
 #
 # Check if we are hitting Helios as we do
-# distribute some of their libraries. 
+# distribute some of their libraries.
 #
 
 if $test -f /etc/HELIOSInstallPath; then
@@ -236,7 +236,7 @@ case `uname -s` in
                     $chown root:wheel $rd/lexx
                     $chmod 0755 $rd/lexx
                     if $test -z "`grep lexx_enable $rf`"; then
-                        echo "lexx_enable=\"YES\"" >> $rf 
+                        echo "lexx_enable=\"YES\"" >> $rf
                     fi
                 fi
             fi
@@ -298,10 +298,10 @@ case `uname -s` in
     ;;
 esac
 
-#                                                                               
-# Assure config directory is present                                            
-#                                                                               
-                                                                                
+#
+# Assure config directory is present
+#
+
 if $test -L "$LDIR"/config; then
     rm -f "$LDIR"/config
 fi
@@ -363,7 +363,7 @@ while $test ! -z "$1"; do
                 $chown -R $usr "$LDIR"/servers/$srv/modules/nslog 1>/dev/null 2>&1
             fi
             ;;
-        -p) 
+        -p)
             shift
             if $test -z "$NASbox"; then
                 if $test -z "$1"; then
@@ -411,7 +411,7 @@ fi
 # Optionally, rename it to the correct port.
 #
 
-cnf=`ls -1 "$LDIR"/config/$srv.[0-9] 2>/dev/null`
+cnf=`ls -1 "$LDIR"/config/$srv.[0-9]* 2>/dev/null`
 if $test $? -ne 0 -o -z "$cnf"; then
     if $test $port -eq 0; then
         port=8000
@@ -524,12 +524,19 @@ while $test $try -gt 0; do
         try=`expr $try - 1`
         continue
     fi
-    bin/nsdchat -s "$url" -x "srvinfo address" >/tmp/$srv.addr 2>/dev/null
+    bin/nsdchat -s "$url" -x "srvinfo hostname" >/tmp/$srv.hnam 2>/dev/null
     if $test $? -eq 0; then
+        bin/nsdchat -s "$url" -x "srvinfo address" >/tmp/$srv.addr 2>/dev/null
+        if $test $? -eq 0; then
+            addr=`cat /tmp/$srv.addr`
+            if $test "$addr" = "::1"; then
+                addr=`cat /tmp/$srv.hnam`
+            fi
+        fi
         bin/nsdchat -s "$url" -x "srvinfo port" > /tmp/$srv.port 2>/dev/null
         bin/nsdchat -s "$url" -x "srvinfo lexxvers" > /tmp/$srv.vers 2>/dev/null
-        urlh="http://`cat /tmp/$srv.addr`:`cat /tmp/$srv.port`/login"
-        urls="https://`cat /tmp/$srv.addr`:`expr \`cat /tmp/$srv.port\` + 443`/login"
+        urlh="http://$addr:`cat /tmp/$srv.port`/login"
+        urls="https://$addr:`expr \`cat /tmp/$srv.port\` + 443`/login"
         echo "pid: $pid (version \"`cat /tmp/$srv.vers`\" running)"
         echo "url: $urlh, $urls (use web-browser to connect)"
         rm -rf /tmp/$srv.*
@@ -550,5 +557,5 @@ fi
 
 echo "Started P5 application server \"$srv\", pid: $pid"
 
-exit 0 
+exit 0
 

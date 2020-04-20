@@ -35,7 +35,7 @@ case `uname -s` in
 esac
 
 srv=lexxsrv
-pid=`cat "$LDIR"/log/$srv.pid`
+pid=`cat "$LDIR"/log/$srv.pid 2>/dev/null`
 if test $? -gt 0; then
     echo "can't connect to server: not running?"
     exit 1
@@ -52,18 +52,27 @@ fi
 #
 
 cd "$LDIR"
-bin/nsdchat -c "srvinfo address" >/tmp/$srv.addr
-bin/nsdchat -c "srvinfo port" >/tmp/$srv.port
-bin/nsdchat -c "srvinfo lexxvers" >/tmp/$srv.vers
+bin/nsdchat -c "srvinfo hostname" >/tmp/$srv.hnam 2>/dev/null
 ret=$?
-cd $cwd
-
-if test $ret -eq 0; then
-    url="http://`cat /tmp/$srv.addr`:`cat /tmp/$srv.port`/login"            
-    echo "pid: $pid (version \"`cat /tmp/$srv.vers`\" running)"             
-    echo "url: $url (use web-browser to connect)"                           
+if test $ret -ne 0; then
+    echo "can't connect to server: not running?"
+else
+    bin/nsdchat -c "srvinfo address" >/tmp/$srv.addr 2>/dev/null
+    if test $? -eq 0; then
+        addr=`cat /tmp/$srv.addr`
+        if test "$addr" == "::1"; then
+            addr=`cat /tmp/$srv.hnam`
+        fi
+    fi
+    bin/nsdchat -c "srvinfo port" > /tmp/$srv.port 2>/dev/null
+    bin/nsdchat -c "srvinfo lexxvers" > /tmp/$srv.vers 2>/dev/null
+    urlh="http://$addr:`cat /tmp/$srv.port`/login"
+    urls="https://$addr:`expr \`cat /tmp/$srv.port\` + 443`/login"
+    echo "pid: $pid (version \"`cat /tmp/$srv.vers`\" running)"
+    echo "url: $urlh, $urls (use web-browser to connect)"
+    rm -rf /tmp/$srv.*
 fi
-rm -rf /tmp/$srv.*
+cd $cwd
 
 exit $ret
 

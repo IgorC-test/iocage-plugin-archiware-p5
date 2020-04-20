@@ -173,7 +173,7 @@ proc srvconf {args} {
     ns_param map "GET  /login"
     ns_param map "POST /lexxapp"
     ns_param map "GET  /lexxapp"
-    ns_param maxthreads 1
+    ns_param maxthreads 2
     ns_param minthreads 1
     ns_param threadtimeout 180
 

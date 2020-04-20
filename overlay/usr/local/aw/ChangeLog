@@ -1,3 +1,51 @@
+2020-03-10 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 6.0.1 released.
+
+       * Notarized for macOS Catalina.
+
+       * Added missing application page for bulk volume delete (Bug#1176).
+
+       * Fixed typo in start-server script.
+
+       * Fixed (re-)creation of ACLs on restore for Mac builds (Bug#1181).
+
+       * Fixed setting group path references for many clients (Bug#1187).
+
+       * Fixed installing regular license for Desktop edition (Bug#1185).
+
+       * Fixed user check in verify/restore to remote clients (Bug#1184).
+
+       * Fixed handling of some illegal chars in REST interface (Bug#1177).
+
+       * Fixed turning-off data compression (Bug#1175).
+
+       * Fixed unzip of restore selection during B2Go restore (Bug#1174).
+
+       * Fixed spelling in B2Go log (Bug##1173),
+
+       * Fixed handling of restore over restore selection when
+         multiple snapshot have been selected (Bug#1172).
+
+       * Fixed handling configuration DB on Windows (Bug#1162).
+
+       * Object archives now support only non-empty regular files (Bug#1160).
+
+       * Fixed auto-schedule of B2Go workstations (Bug#1158).
+
+       * Added hint about HTTP protoocol port in client config (Bug#1149).
+
+       * Fixed upload to Google cloud storage (Bug#1145).
+
+       * Fixed restore selection that restore same file(s) twice
+         when located on two/more volumes (Bug#1140).
+
+       * Fixed auto-deletion of old LTFS-pools (Bug#1134).
+
+       * Fixed restore from Sync cycles on BTRFS (Bug#1049).
+
+       * Fixed support for passwords with embedded colon (Bug#932).
+
 2020-01-15 Zoran Vasiljevic <zv@archiware.com>
 
         Version 6.0.0 released.
@@ -149,15 +197,15 @@
 
        * FR#930: Adding metadata in P5 archive.
 
-         Added more clever logic: per-job metadata can be 
-         overriden by non-empty per-file metadata. 
+         Added more clever logic: per-job metadata can be
+         overriden by non-empty per-file metadata.
          One can mix both but one cannot combine/merge values.
 
        * FR#929: Backup of nested filesystems.
 
          In order to support backup of large/deep hierarchical
          filesystems (like for example ZFS) one can now enable
-         crossing filesystem boundary while walking the 
+         crossing filesystem boundary while walking the
          filesystem tree and looking for changed files.
          To do that, one needs to edit config/lexxsrv.<PORT>
          file (where <PORT> is the value assigned during the
@@ -166,7 +214,7 @@
 
             ns_sect ns/server/$server/module/Backup/CLIENT
             ns_param crossFilesystemBoundary true
-  
+
          where CLIENT is the name of the P5 client.
          Default value for crossFilesystemBoundary is "false",
          which means that file walk will not cross filesystem
@@ -212,11 +260,11 @@
 
             ns_sect ns/server/$server/module/Sync
             ns_param cycleThreadCount 1
-  
+
          Default value for cycleThreadCount is 1 (one).
          Increasing number of threads for cycle generation might
          speed up this (lenghtly) operation if target filesystem
-         is located on SSD device or on a very fast RAID system. 
+         is located on SSD device or on a very fast RAID system.
 
          After changing the file, P5 needs to be restarted for
          changes to become active.
@@ -235,7 +283,7 @@
        * Fixed cleanup of backup indexes containing large
          number of recycled volumes (Bug#918).
 
-       * Fixed handling of Mac resource forks for HFS+ -> HFS+ 
+       * Fixed handling of Mac resource forks for HFS+ -> HFS+
          copies (Bug#915).
 
        * Added "ignore cleaning flag" for special applications.
@@ -252,7 +300,7 @@
 
          After changing the file, P5 needs to be restarted for
          changes to become active.
-  
+
        * Fixed write-speed issues for large-file archives (Bug#913).
 
        * Fixed auto-recognition of EtherShare volumes (Bug#907).
@@ -265,7 +313,7 @@
 
        * Reduce number of warnings in GUI about Sync plans running
          in transfer mode (Bug#900).
- 
+
        * Fixed restore entry for Sync plans when there is only
          one Sync license configured (Bug#989).
 
@@ -274,7 +322,7 @@
 
        * Fixed spurious virtual tape driver errors claiming the
          volume being written has no label attached (Bug#891).
- 
+
        * Fixed loading the LTFS driver for IBM LTO drives (Bug#890).
 
        * Fixed Sync file-event handling when source of events is
@@ -295,11 +343,11 @@
 
        * Fixed generic install script on Unix to ignore Synology
          install options (Bug#842).
- 
+
        * Removed scanning files before arhive and backup.
          This feature was simply consuming resources and
          did not provide any realy useful information.
-        
+
        * Fixed label of cloud volumes in case of upload errors
          (Bug#820).
 
@@ -311,7 +359,7 @@
         Version 5.6.1 released.
 
        * Fixed issues when logging-in as root into the GUI.
-    
+
        * Fixed special characters handling in Sync from
          Helios (and potentially Xinet) fileserver volumes.
 
