@@ -1,3 +1,44 @@
+2020-06-29 Zoran Vasiljevic <zv@archiware.com>
+
+        Version 6.0.2 released.
+
+       * Fixed update of user/group records during V6 transition (Bug#1220).
+
+       * Fixed autostart on system boot for CentOS7 (and later) (Bug#1223).
+
+       * Fixed error/warning report for B2Go jobs running against 
+         missing or empty top-level directories (Bug#1235).
+
+       * Fixed B2Go configuration over CLI to gracefully handle
+         multiple server records (Bug#1246). 
+
+       * Deleting the client also deletes its filesystem DB (Bug#1247).
+
+       * Fixed backup task config hint about ignoring filesystem
+         boundary during file/index scan (Bug#1258).
+
+       * Added CLI [User password] command to manipulate GUI login
+         passwords.
+
+       * Added CLI [RestoreSelection addfromvolume] to be able to
+         restore all files located on the given volume.
+
+       * Improved CLI [resolvedups] index maintenance command to handle
+         duplicates in the paths table.
+
+       * Added ns/servers/lexxsrv/module/Sync/cycleCreateIgnoreErrors
+         config option to ignore file-related errors while hard-linking
+         the sync snapshot. UNSUPPORTED. USE AT OWN RISK.
+
+       * Fixed saving file systems mounted at mountpoints
+         on Windows. (Bug#1234, Bug#1253)
+
+       * Fixed job scheduling issues / jobs hanging after start
+         in Windows. (Bug#1238)
+
+       * Fixed P5 process terminating without any apparent cause
+	 on Windows. (Bug#1221)
+
 2020-03-10 Zoran Vasiljevic <zv@archiware.com>
 
         Version 6.0.1 released.

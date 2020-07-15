@@ -18,7 +18,6 @@ case `uname -s` in
     Linux)
         id=/usr/bin/id
         test=test
-        SYNOLOGY=0
         cf=/etc/synoinfo.conf
         if $test -x /bin/get_key_value; then
             if test -f $cf; then
@@ -29,14 +28,12 @@ case `uname -s` in
                 esac
             fi
         fi
-        QNAP=0
         cf=/etc/model.conf
         if $test -f $cf; then
             if test ! -z "`awk '/VENDOR[ \t]*=[ \t]*QNAP/' $cf`"; then
                 NASbox="qnap"
             fi
         fi
-        READYNAS=0
         cf=/proc/readynas/model
         if $test -f $cf; then
             if test ! -z "`grep ReadyNAS $cf`"; then
@@ -47,7 +44,6 @@ case `uname -s` in
     FreeBSD)
         id=/usr/bin/id
         test=test
-        FREENAS=0
         case "`uname -i`" in
             FREENAS*)
                 NASbox="freenas"
@@ -156,13 +152,13 @@ case `uname -s` in
                     echo "ExecStart=$sf start" >> $ss
                     echo "ExecStop=$sf stop" >> $ss
                     echo "Type=forking" >> $ss
-                    echo "TimeoutSec=infinity" >> $ss
+                    echo "TimeoutSec=86400" >> $ss
                     echo "Restart=no" >> $ss
                     echo "User=root" >> $ss
                     echo "Group=root" >> $ss
                     echo "[Install]" >> $ss
                     echo "WantedBy=multi-user.target" >> $ss
-                    $chmod 0755 $ss
+                    $chmod 0644 $ss
                     $chown root $ss
                     /bin/systemctl enable lexx.service 1>/dev/null 2>&1
                 else
@@ -317,12 +313,13 @@ srv=lexxsrv
 usr=root
 
 #
-# Make sure those are protected, as we are
-# currently running under id of zero.
+# Make sure those are protected correctly, 
+# as we are currently running under zero ID.
 #
 
-$chmod 400 "$LDIR"/etc/srvconf.tcl 1>/dev/null 2>&1
-$chmod -R 700 "$LDIR"/config/customerconfig 1>/dev/null 2>&1
+$chmod    0400 "$LDIR"/etc/srvconf.tcl 1>/dev/null 2>&1
+$chmod -R 0700 "$LDIR"/config/customerconfig 1>/dev/null 2>&1
+$chown    $usr "$LDIR"/etc/srvconf.tcl 1>/dev/null 2>&1
 $chown -R $usr "$LDIR"/config 1>/dev/null 2>&1
 $chown -R $usr "$LDIR"/log 1>/dev/null 2>&1
 $chown -R $usr "$LDIR"/etc/languages 1>/dev/null 2>&1
@@ -357,6 +354,7 @@ while $test ! -z "$1"; do
             fi
             usr=$1
             if $test `$id -u $usr 2>/dev/null` -gt 0; then
+                $chown    $usr "$LDIR"/etc/srvconf.tcl 1>/dev/null 2>&1
                 $chown -R $usr "$LDIR"/config 1>/dev/null 2>&1
                 $chown -R $usr "$LDIR"/log 1>/dev/null 2>&1
                 $chown -R $usr "$LDIR"/etc/languages 1>/dev/null 2>&1
