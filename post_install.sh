@@ -1,9 +1,4 @@
 #!/bin/sh
-echo "creating Archiware P5 folder"
-mkdir /usr/local/aw
-cd /usr/local/aw
-echo "downloading Archiware P5 tgz package"
-wget http://p5-downloads.s3.amazonaws.com/awpst610-freebsd12.tgz
 echo "unpacking tar"
 tar -xvf /usr/local/aw/awpst*-freebsd12.tgz -C /usr/local/aw/
 echo "deleting tgz"
