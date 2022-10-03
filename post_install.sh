@@ -2,7 +2,7 @@
 mkdir /usr/local/aw
 cd /usr/local/aw
 echo "downloading package"
-fetch http://p5-downloads.s3.amazonaws.com/awpst707-freebsd12.tgz
+fetch http://p5-downloads.s3.amazonaws.com/awpst710-freebsd12.tgz
 echo "unpacking tar"
 tar -xvf /usr/local/aw/awpst*-freebsd12.tgz -C /usr/local/aw/
 echo "deleting tgz"
